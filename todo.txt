@@ -1,0 +1,4 @@
+
+TODO search double by (SIZE && HASH)
+
+TODO key -R to really remove files
