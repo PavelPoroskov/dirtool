@@ -16,7 +16,6 @@ switch (true) {
     console.log('usage: ')
     console.log(' dirtool merge source-dir dest-dir')
     console.log(' dirtool filter source-dir dest-dir filter')
-    console.log('   filter is list of file extensions with comma. e.i pdf,epub,fb')
 
     process.exit(1)
   }

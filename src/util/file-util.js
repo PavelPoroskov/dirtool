@@ -1,8 +1,9 @@
-import fs from 'node:fs/promises';
+import fsP from 'node:fs/promises';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 export async function getFileSize(inFullPath) {
-  const fileStats = await fs.stat(inFullPath);
+  const fileStats = await fsP.stat(inFullPath);
 
   return  fileStats.size
 }
@@ -15,4 +16,8 @@ export async function getFileHashMD5(inFullPath) {
     stream.on('data', chunk => hash.update(chunk));
     stream.on('end', () => resolve(hash.digest('hex')));
   });
+}
+
+export async function deleteFile(inFullPath) {
+  await fsP.unlink(inFullPath);
 }
