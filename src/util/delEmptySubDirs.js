@@ -1,53 +1,61 @@
-import { existsSync } from 'node:fs';
-import { opendir } from 'node:fs/promises';
+import { opendir, rmdir } from 'node:fs/promises';
 import path from 'node:path';
+import { runOperationsWithConcurrencyLimit20 } from './runOperationsWithConcurrencyLimit.js';
 
-async function getAllFiles(inDir, level=0) {
+async function getDirs(inDir, level=0) {
   const dirIter = await opendir(inDir);
-  const fileList = []
   const dirList = []
+  const isHasFiles = false
 
   for await (const dirent of dirIter) {
-    //console.log(' '.repeat(), dirent.name)
-
     if (dirent.isDirectory()) {
-      if (dirent.name.startsWith('.')) {
-        // console.log('IGNORING DIR', path.join(dirent.parentPath, dirent.name))
-      } else {
-        dirList.push(
-          path.join(dirent.parentPath, dirent.name)
-        )
-      }
+      dirList.push(
+        path.join(dirent.parentPath, dirent.name)
+      )
     } else if (dirent.isFile()) {
-      // console.log(dirent.parentPath, dirent.name)
-      fileList.push({
-        // parentPath: dirent.parentPath,
-        name: dirent.name,
-        fullPath: path.join(dirent.parentPath, dirent.name),
-        level
-      })
+      isHasFiles = true
     }
   }
 
-  const fileListList = await Promise.all(
-    dirList.map((dirPath) => getAllFiles(dirPath, level + 1))
+  const dirListList = await Promise.all(
+    dirList.map((dirPath) => getDirs(dirPath, level + 1))
   )
 
-  return fileListList.concat(fileList)
+  return dirListList
     .flat()
+    .concat({
+      fullPath: inDir,
+      isHasFiles: isHasFiles || dirListList.some(({ isHasFiles }) => isHasFiles === true),
+      level,
+    })
 }
 
 export async function delEmptySubDirs(inFullPath) {
-  const sourceFilList = await getAllFiles(sourceDir)
+  const dirList = await getDirs(sourceDir)
+  const deleteList = dirList
+    .filter((i) => !i.isHasFiles && i.level > 0)
+    // .toSorted((a,b) => -(a.level - b.level))
+
+  const groupedObj = Object.groupBy(deleteList, ({ level }) => level);
+
+  const keysDesc = Object.keys(groupedObj).toSorted((a,b) => -(+a -b))
+
+  for (const level of keysDesc) {
+    await runOperationsWithConcurrencyLimit20({
+      operationArgumentsList: groupedObj[level],
+      asyncOperation: ({ fullPath }) => rmdir(fullPath),
+    })
+  }
+
+  // sort desc by level
+  // remove dirs without files
+
   // fileList.sort((a,b) => a.fullPath.localeCompare(b.fullPath))
-  console.log('source dir: full path', path.resolve(sourceDir))
-  console.log('source dir: all files', sourceFilList.length)
+  // console.log('subdirectories: full path', path.resolve(inFullPath))
+  console.log('subdirectories: all', dirList.length - 1)
+  console.log('subdirectories, can delete:', deleteList.length)
   console.log()
 
-
-  let nTheSameFile = 0
-
-  const nRestFile = sourceFilList.length - nTheSameFile
-  console.log(`The same files were in source and dest dir ${nTheSameFile}. They were removed from source directory`)
-  console.log(`${nRestFile} files are left in source directory.`)
+  const nRestDirs = dirList.length - 1 - deleteList.length
+  console.log(`${nRestDirs} dirs are left in source directory.`)
 }

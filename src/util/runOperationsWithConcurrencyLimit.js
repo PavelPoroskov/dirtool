@@ -1,12 +1,17 @@
-export const runOperationsWithConcurrencyLimit = async ({
-  arOperationArguments = [],
+const runOperationsWithConcurrencyLimit = async ({
+  operationArgumentsList = [],
   asyncOperation,
   concurrencyLimit = 0,
 }) => {
-  const innerArguments = arOperationArguments.map((operationArguments, index) => ({
+  const inOperationArgumentsList = operationArgumentsList?.[Symbol.iterator]
+    ? Array.from(operationArgumentsList)
+    : operationArgumentsList
+  
+  const innerArguments = inOperationArgumentsList.map((operationArguments, index) => ({
     operationArguments,
     resultIndex: index,
   }));
+
   const arResults = new Array(innerArguments.length);
   const concurrentPromises = new Array(concurrencyLimit || innerArguments.length)
     .fill(Promise.resolve());
@@ -33,4 +38,7 @@ export const runOperationsWithConcurrencyLimit = async ({
   return arResults;
 };
 
-
+export const runOperationsWithConcurrencyLimit20 = async (ops) => runOperationsWithConcurrencyLimit({
+  ...ops,
+  concurrencyLimit: 20,
+})

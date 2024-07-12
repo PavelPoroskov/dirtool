@@ -21,3 +21,16 @@ export async function getFileHashMD5(inFullPath) {
 export async function deleteFile(inFullPath) {
   await fsP.unlink(inFullPath);
 }
+
+export async function isDirExist(inFullPath) {
+  let result = false
+
+  try {
+    await fsP.access(inFullPath);
+    result = true
+  } catch {
+    result = false
+  } 
+  
+  return result
+}
