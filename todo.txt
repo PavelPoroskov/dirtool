@@ -1,2 +1,7 @@
 
 TODO key -R to really remove files
+
+pdf with notes has different hash than pdf without notes
+  compare pdf using info from pdf
+
+source dir has internal doubles

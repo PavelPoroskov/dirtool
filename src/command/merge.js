@@ -2,7 +2,9 @@ import { opendir } from 'node:fs/promises';
 import path from 'node:path';
 import { logDebug } from '../util/log.js';
 import { getFileSize, getFileHashMD5, deleteFile, isDirExist } from '../util/file-util.js';
-import { delEmptySubDirs } from '../util/delEmptySubDirs.js';
+import { delEmptyDirs } from '../util/delEmptyDirs.js';
+import { delHiddenDirs } from '../util/delHiddenDirs.js';
+
 import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
 import { ExtraSet } from '../util/extra-set.js';
 
@@ -46,6 +48,7 @@ async function findDoubles({ sourceDir, destDir }) {
   // fileList.sort((a,b) => a.fullPath.localeCompare(b.fullPath))
   console.log('source dir: full path', sourceDir)
   console.log('source dir: all files', sourceFileList.length)
+  // console.log('source dir: all files', sourceFileList)
   console.log()
 
   const destFilList = await getAllFiles(destDir)
@@ -96,7 +99,7 @@ async function findDoubles({ sourceDir, destDir }) {
       })
     }
   })
-
+  
   const getHashForSourceResultList = await runOperationsWithConcurrencyLimit20({
     operationArgumentsList: getHashSourceSet.values(),
     asyncOperation: async (fullPath) => {
@@ -126,12 +129,19 @@ async function findDoubles({ sourceDir, destDir }) {
   getHashForDestResultList.forEach(({ fullPath, hashMD5 }) => {
     destFileByFullPath[fullPath].hashMD5 = hashMD5
   })
+  // console.log('checkNameAndHashList', checkNameAndHashList)
+  // console.log('sourceFileByFullPath', sourceFileByFullPath)
+  // console.log('destFileByFullPath', destFileByFullPath)
 
   checkNameAndHashList.forEach(({ sourceFullPathList, destFullPathList, name }) => {
+    // console.log('checkNameAndHashList name', name)
     const destHashSet = new Set(
       destFullPathList.map((destFullPath) => destFileByFullPath[destFullPath].hashMD5)
     )
+    // console.log('checkNameAndHashList destFullPathList', destFullPathList)
+    // console.log('checkNameAndHashList destHashSet', destHashSet)
     sourceFullPathList.forEach((sourceFullPath) => {
+      // console.log('checkNameAndHashList sourceFullPath', sourceFullPath, sourceFileByFullPath[sourceFullPath].hashMD5)
       if (destHashSet.has(sourceFileByFullPath[sourceFullPath].hashMD5)) {
         sourceFileByFullPath[sourceFullPath].isDouble = true
         nTheSameFileByNameAndHash += 1
@@ -267,9 +277,13 @@ async function findDoubles({ sourceDir, destDir }) {
 }
 
 export async function mergeCommand() {
+  // console.log('process.argv', process.argv)
   const [_, __, command] = process.argv.slice(0,3)
+  // console.log('process.argv.slice(0,3)', process.argv.slice(0,3))
   const argumentsAfterCommand = process.argv.slice(3)
+  // console.log('argumentsAfterCommand', argumentsAfterCommand)
   const isDelete = !!(argumentsAfterCommand.find((arg) => arg === '-R'))
+  // console.log('isDelete', isDelete)
   // const isDelete = true
   const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
   const [sourceDir, destDir] = argumentsWithoutKeys
@@ -282,24 +296,24 @@ export async function mergeCommand() {
       sourceDir: path.resolve(sourceDir),
       destDir: path.resolve(destDir),
     })
+    console.log(`To remove files from source dir ${sourceDoubleList.length}`)
 
     if (isDelete) {
-      console.log(`To remove files from source dir ${sourceDoubleList.length}`)
-  
       await runOperationsWithConcurrencyLimit20({
         operationArgumentsList: sourceDoubleList,
         asyncOperation: deleteFile,
       })
       console.log('The same files were removed from source directory')
-  
-      // TODO remove empty subdirs in source dir
-      await delEmptySubDirs(sourceDir)
-      console.log('Empty subdirectories was removed from source dir.')
     }  
 
     const nRestFile = sourceFileListSize - sourceDoubleList.length
     console.log()
     console.log(`${nRestFile} files are left in source directory.`)
+
+    if (isDelete) {
+      await delHiddenDirs(sourceDir)
+      await delEmptyDirs(sourceDir)
+    }  
   
   } else {
     console.log('usage: ')
