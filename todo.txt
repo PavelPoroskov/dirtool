@@ -4,4 +4,45 @@ TODO key -R to really remove files
 pdf with notes has different hash than pdf without notes
   compare pdf using info from pdf
 
+  the same for epub?
+
 source dir has internal doubles
+
+
+dirtool empty-dir        -- show
+dirtool empty-dir [-R]   -- remove
+
+commands for one folder
+=======================
+dirtool empty-dir [-R]
+
+dirtool hidden-dir [-R]
+
+dirtool double [-R]
+  left one with most low level
+
+DONE dirtool extension
+  show used extension with quantity, ?and percentage of volume/quantity
+
+  pdf, epub, fb2, azw3, .fb2.zip
+  pptx, -rar, zip
+  mp4 90%
+
+  --list=zip
+
+dirtool info
+  quantity of files
+  quantity of dirs
+  total volume
+  ?most big folder. sorted descending with percentage
+
+commands for two folders
+========================
+dirtool filter source-dir dest-dir pdf,epub,fb2,azw3
+
+  dirtool list => dirtool filter (dirtool copy filter=)
+  
+// remove from source files that exist in dest-dir
+dirtool merge source-dir dest-dir
+
+show used time

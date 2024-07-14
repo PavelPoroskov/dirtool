@@ -6,7 +6,7 @@ import { delEmptyDirs } from '../util/delEmptyDirs.js';
 import { delHiddenDirs } from '../util/delHiddenDirs.js';
 
 import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
-import { ExtraSet } from '../util/extra-set.js';
+import { ExtraSet } from '../util/extra-structure.js';
 
 async function getAllFiles(inDir, level=0) {
   const dirIter = await opendir(inDir);
