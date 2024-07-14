@@ -9,7 +9,7 @@ async function getHiddenDir(inDir, level=0) {
 
   for await (const dirent of dirIter) {
     if (dirent.isDirectory()) {
-      if (dirent.name.startsWith('.')) {
+      if (dirent.name.startsWith('.') || dirent.name === '__MACOSX') {
         hiddenDirList.push({
           fullPath: path.join(dirent.parentPath, dirent.name),
           level

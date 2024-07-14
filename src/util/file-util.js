@@ -18,6 +18,39 @@ export async function getFileHashMD5(inFullPath) {
   });
 }
 
+export const getExtname = (s) => {
+  let result = ''
+  let arAfterName = []
+
+  const arr = s.split('.')
+  const [first, second] = arr
+
+  if (first) {
+    // all from 1.. can be extension
+    arAfterName = arr.slice(1)
+  } else if (second) {
+    // all from 2.. can be extension
+    arAfterName = arr.slice(2)
+  }
+
+  const ext1 = arAfterName.at(-1)
+  const ext2 = arAfterName.at(-2)
+
+  if (ext1) {
+    result = `.${ext1}`
+
+    if (ext1 === 'zip' && ext2 === 'fb2') {
+      result = `.${ext2}.${ext1}`
+    }
+  }
+
+  // .gitignore =>  ''
+  // .eslint.rc => .rc
+  // 11.fb2.zip => .fb2.zip
+
+  return result
+}
+
 export async function deleteFile(inFullPath) {
   await fsP.unlink(inFullPath);
 }
@@ -26,8 +59,10 @@ export async function isDirExist(inFullPath) {
   let result = false
 
   try {
-    await fsP.access(inFullPath);
-    result = true
+    await fsP.access(inFullPath, fsP.constants.R_OK | fsP.constants.W_OK);
+    const stats = await fsP.stat(inFullPath)
+
+    result = stats.isDirectory()
   } catch {
     result = false
   } 

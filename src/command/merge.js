@@ -1,6 +1,5 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
-import { logDebug } from '../util/log.js';
 import { getFileSize, getFileHashMD5, deleteFile, isDirExist } from '../util/file-util.js';
 import { delEmptyDirs } from '../util/delEmptyDirs.js';
 import { delHiddenDirs } from '../util/delHiddenDirs.js';
@@ -17,7 +16,7 @@ async function getAllFiles(inDir, level=0) {
     //console.log(' '.repeat(), dirent.name)
 
     if (dirent.isDirectory()) {
-      if (dirent.name.startsWith('.')) {
+      if (dirent.name.startsWith('.') || dirent.name === '__MACOSX') {
         // console.log('IGNORING DIR', path.join(dirent.parentPath, dirent.name))
       } else {
         dirList.push(
@@ -133,7 +132,7 @@ async function findDoubles({ sourceDir, destDir }) {
   // console.log('sourceFileByFullPath', sourceFileByFullPath)
   // console.log('destFileByFullPath', destFileByFullPath)
 
-  checkNameAndHashList.forEach(({ sourceFullPathList, destFullPathList, name }) => {
+  checkNameAndHashList.forEach(({ sourceFullPathList, destFullPathList }) => {
     // console.log('checkNameAndHashList name', name)
     const destHashSet = new Set(
       destFullPathList.map((destFullPath) => destFileByFullPath[destFullPath].hashMD5)
@@ -252,7 +251,7 @@ async function findDoubles({ sourceDir, destDir }) {
     destFileByFullPath[fullPath].hashMD5 = hashMD5
   })
 
-  checkSizeAndHashList.forEach(({ sourceFullPathList, destFullPathList, size }) => {
+  checkSizeAndHashList.forEach(({ sourceFullPathList, destFullPathList }) => {
     const destHashSet = new Set(
       destFullPathList.map((destFullPath) => destFileByFullPath[destFullPath].hashMD5)
     )
@@ -278,6 +277,7 @@ async function findDoubles({ sourceDir, destDir }) {
 
 export async function mergeCommand() {
   // console.log('process.argv', process.argv)
+  // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   // console.log('process.argv.slice(0,3)', process.argv.slice(0,3))
   const argumentsAfterCommand = process.argv.slice(3)

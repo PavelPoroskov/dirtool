@@ -36,13 +36,17 @@ dirtool info
   total volume
   ?most big folder. sorted descending with percentage
 
+dirtool search nodejs microservice
+dirtool search (nodejs|javascript|typescript) microservice NOT=
+  return list of files that contain this words in file name
+
 commands for two folders
 ========================
-dirtool filter source-dir dest-dir pdf,epub,fb2,azw3
+DONE dirtool filter source-dir dest-dir pdf,epub,fb2,azw3
 
   dirtool list => dirtool filter (dirtool copy filter=)
   
 // remove from source files that exist in dest-dir
-dirtool merge source-dir dest-dir
+DONE dirtool merge source-dir dest-dir
 
 show used time
