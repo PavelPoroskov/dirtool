@@ -23,7 +23,7 @@ async function getFileList({ dir, filterList }) {
             path.join(dirent.parentPath, dirent.name)
           )
         }
-      } else if (dirent.isFile()) {
+      } else if (dirent.isFile() || dirent.isSymbolicLink()) {
         const ext = getExtname(dirent.name)
 
         if (filterSet.has(ext)) {

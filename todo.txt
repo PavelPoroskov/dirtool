@@ -18,9 +18,6 @@ DONE dirtool empty [-R]
 
 DONE dirtool hidden [-R]
 
-dirtool double [-R]
-  left one with most low level
-
 DONE dirtool extension
   show used extension with quantity, ?and percentage of volume/quantity
 
@@ -36,7 +33,10 @@ dirtool info
   total volume
   ?most big folder. sorted descending with percentage
 
-dirtool search nodejs microservice
+TODO-NEXT dirtool double [-R]
+  left one with most low level
+
+TODO-NEXT dirtool search nodejs microservice
 dirtool search (nodejs|javascript|typescript) microservice NOT=
   return list of files that contain this words in file name
 

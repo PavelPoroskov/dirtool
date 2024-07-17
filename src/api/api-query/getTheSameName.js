@@ -5,36 +5,40 @@ import { getExtname, getNameWithoutExt } from '../../util/file-util.js';
 
 const ignoreExtSet = new Set([
   '.css',
+  '.dot',
+  '.hbs',
   '.html',
+  '.jpg',
   '.js',
   '.json',
   '.jsx',
+  '.key',
+  '.lock',
   '.md',
+  '.mp4',
+  '.ncx',
   '.png',
   '.rb',
   '.rs.txt',
   '.rs',
-  '.svg',
-  '.txt',
-  '.mp4',
-  '.hbs',
-  '.tla',
-  '.dot',
-  '.jpg',
   '.srt',
-  '.lock',
+  '.svg',
+  '.tla',
+  '.txt',
 ])
 const ignoreFileSet = new Set([
-  'Rakefile',
-  'rustfmt-ignore',
-  'Dockerfile',
-  'yarn.lock',
-  'README',
   'Cargo.toml',
+  'code.zip',
+  'css',
+  'Dockerfile',
   'embeddings.zip',
+  'jit',
   'LICENSE-APACHE',
   'LICENSE-MIT',
-  'code.zip',
+  'Rakefile',
+  'README',
+  'rustfmt-ignore',
+  'yarn.lock',
 ])
 export async function getTheSameName(inFullPath) {
   const nameList = {}
@@ -55,6 +59,7 @@ export async function getTheSameName(inFullPath) {
       } else if (dirent.isFile()) {
         const ext = getExtname(dirent.name)
 
+        /* eslint-disable no-empty */
         if (ignoreExtSet.has(ext)) {
 
         } else if (ignoreFileSet.has(dirent.name)) {
@@ -62,6 +67,7 @@ export async function getTheSameName(inFullPath) {
         } else if (dirent.name.startsWith('.')) {
 
         } else {
+        /* eslint-enable no-empty */
           const name = getNameWithoutExt(dirent.name)
 
           if (nameList[name]) {
@@ -83,7 +89,7 @@ export async function getTheSameName(inFullPath) {
   await traverseDir(inFullPath)
 
   return Object.entries(nameList)
-    .filter(([name, list]) => list.length > 1)
+    .filter(([, list]) => list.length > 1)
     .map(([name, fullPathList]) => {
       const sorted = fullPathList.sort((a,b) => a.localeCompare(b))
 
