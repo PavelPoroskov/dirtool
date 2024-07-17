@@ -1,8 +1,8 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
 import { getFileSize, getFileHashMD5, deleteFile, isDirExist } from '../util/file-util.js';
-import { delEmptyDirs } from '../util/delEmptyDirs.js';
-import { delHiddenDirs } from '../util/delHiddenDirs.js';
+import { delEmptyDirs } from '../api/api-change/delEmptyDirs.js';
+import { delHiddenDirs } from '../api/api-change/delHiddenDirs.js';
 
 import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
 import { ExtraSet } from '../util/extra-structure.js';
@@ -276,17 +276,15 @@ async function findDoubles({ sourceDir, destDir }) {
 }
 
 export async function mergeCommand() {
-  // console.log('process.argv', process.argv)
   // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
-  // console.log('process.argv.slice(0,3)', process.argv.slice(0,3))
   const argumentsAfterCommand = process.argv.slice(3)
-  // console.log('argumentsAfterCommand', argumentsAfterCommand)
-  const isDelete = !!(argumentsAfterCommand.find((arg) => arg === '-R'))
-  // console.log('isDelete', isDelete)
-  // const isDelete = true
   const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
+  const keyList = argumentsAfterCommand.filter((i) => i.startsWith('-'))
+  const keyMap = new Map(keyList.map((i) => i.split('=')))
+
   const [sourceDir, destDir] = argumentsWithoutKeys
+  const isDelete = keyMap.has('-R')
 
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
   const isDestDirExist = !!destDir && isDirExist(destDir)

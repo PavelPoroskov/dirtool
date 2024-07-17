@@ -89,13 +89,12 @@ export async function extensionCommand() {
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
   const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
-  const [sourceDir] = argumentsWithoutKeys
-
   const keyList = argumentsAfterCommand.filter((i) => i.startsWith('-'))
-  const keySet = new Set(keyList)
-  const isSortName = keySet.has('-sn')
-  //const isSortCount = keySet.has('-sc')
-  const isSortSize = keySet.has('-sz')
+  const keyMap = new Map(keyList.map((i) => i.split('=')))
+
+  const [sourceDir] = argumentsWithoutKeys
+  const isSortName = keyMap.has('-sn')
+  const isSortSize = keyMap.has('-sz')
 
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
 
@@ -117,8 +116,7 @@ export async function extensionCommand() {
     
     console.table(listFormatted)
     // console.log('list: ', list)
-    console.log('Total files: ', totalCountFile)
-    console.log('Total dirs: ', totalCountDir)
+    console.log(`Total files ${totalCountFile}. Total dirs ${totalCountDir}. Total ${totalCountFile + totalCountDir}.`)
     console.log('Total size: ', formatSize(totalSize))
 
   } else {

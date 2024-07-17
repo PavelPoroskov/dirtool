@@ -39,7 +39,9 @@ export const getExtname = (s) => {
   if (ext1) {
     result = `.${ext1}`
 
-    if (ext1 === 'zip' && ext2 === 'fb2') {
+    if (ext2 === 'fb2' && ext1 === 'zip') {
+      result = `.${ext2}.${ext1}`
+    } else if  (ext2 === 'rs' && ext1 === 'txt') { 
       result = `.${ext2}.${ext1}`
     }
   }
@@ -49,6 +51,13 @@ export const getExtname = (s) => {
   // 11.fb2.zip => .fb2.zip
 
   return result
+}
+
+export const getNameWithoutExt = (basename) => {
+  // const basename = path.basename(inS)
+  const ext = getExtname(basename)
+
+  return basename.slice(0, basename.length - ext.length)
 }
 
 export async function deleteFile(inFullPath) {

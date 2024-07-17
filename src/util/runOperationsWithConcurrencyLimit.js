@@ -52,9 +52,11 @@ export const runOperationsWithConcurrencyLimit = async ({
     concurrentPromiseList.map(chainNext)
   );
 
+  /* eslint-disable no-unused-vars */
   return Array.from(resultMap.entries())
     .sort((a,b) => a[0] - b[0])
-    .map(([i,v]) => v)
+    .map(([_,v]) => v)
+  /* eslint-enable no-unused-vars */
 };
 
 export const runOperationsWithConcurrencyLimit20 = async (ops) => runOperationsWithConcurrencyLimit({

@@ -1,7 +1,11 @@
 import { mergeCommand } from './command/merge.js';
 import { filterCommand } from './command/filter.js'
 import { extensionCommand } from './command/extension.js'
+import { emptyCommand } from './command/empty.js'
+import { hiddenCommand } from './command/hidden.js'
+import { nameCommand } from './command/name.js'
 
+// eslint-disable-next-line no-unused-vars
 const [_, __, command] = process.argv
 
 switch (true) {
@@ -17,6 +21,23 @@ switch (true) {
     await extensionCommand()
     break;
   }  
+  case command === 'empty': {
+    await emptyCommand()
+    break;
+  } 
+  case command === 'hidden': {
+    await hiddenCommand()
+    break;
+  } 
+  case command === 'name': {
+    // the same name but different extension
+    await nameCommand()
+    break;
+  } 
+  // case command === 'double': {
+  //   await doubleCommand()
+  //   break;
+  // } 
   default: {
     console.log('usage: ')
     console.log(' dirtool merge source-dir dest-dir')

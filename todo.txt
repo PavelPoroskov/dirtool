@@ -14,9 +14,9 @@ dirtool empty-dir [-R]   -- remove
 
 commands for one folder
 =======================
-dirtool empty-dir [-R]
+DONE dirtool empty [-R]
 
-dirtool hidden-dir [-R]
+DONE dirtool hidden [-R]
 
 dirtool double [-R]
   left one with most low level
