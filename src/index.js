@@ -4,6 +4,7 @@ import { extensionCommand } from './command/extension.js'
 import { emptyCommand } from './command/empty.js'
 import { hiddenCommand } from './command/hidden.js'
 import { nameCommand } from './command/name.js'
+import { searchCommand } from './command/search.js'
 
 // eslint-disable-next-line no-unused-vars
 const [_, __, command] = process.argv
@@ -32,6 +33,11 @@ switch (true) {
   case command === 'name': {
     // the same name but different extension
     await nameCommand()
+    break;
+  } 
+  case command === 'search': {
+    // the same name but different extension
+    await searchCommand()
     break;
   } 
   // case command === 'double': {
