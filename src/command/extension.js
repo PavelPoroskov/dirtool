@@ -121,9 +121,10 @@ export async function extensionCommand() {
 
   } else {
     console.log('usage: ')
-    console.log(' dirtool extension source-dir [-sn|-sx|-sz]')
+    console.log(' dirtool extension source-dir [-sn|-sz]')
+    console.log('   Statistics by file extensions')
+    console.log('   Default descending sort by quantity.')
     console.log('   -sn -- sort by extension name.')
-    console.log('   -sc -- sort by quantity. descending, default')
     console.log('   -sz -- sort by size. descending')
     process.exit(1)
   }

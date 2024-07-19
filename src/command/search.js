@@ -30,9 +30,10 @@ export async function searchCommand() {
     })
   } else {
     console.log('usage: ')
-    console.log(' dirtool serach dir (substring|-rx=regexp)')
+    console.log(' dirtool search dir (substring|-rx=regexp)')
     // eslint-disable-next-line no-useless-escape
-    console.log(' dirtool serach dir -rx="^\d\d\d\d\s"')
+    console.log(' dirtool search dir -rx="^\d\d\d\d\s"')
+    console.log('   Search files with substring in name or with regexp')
     process.exit(1)
   }
 }

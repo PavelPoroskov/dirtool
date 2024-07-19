@@ -27,6 +27,7 @@ export async function nameCommand() {
   } else {
     console.log('usage: ')
     console.log(' dirtool name dir')
+    console.log('   Search files with the same name but with different extension')
     process.exit(1)
   }
 }

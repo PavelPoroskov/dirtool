@@ -1,5 +1,5 @@
 import { mergeCommand } from './command/merge.js';
-import { filterCommand } from './command/filter.js'
+import { copyCommand } from './command/copy.js'
 import { extensionCommand } from './command/extension.js'
 import { emptyCommand } from './command/empty.js'
 import { hiddenCommand } from './command/hidden.js'
@@ -9,46 +9,49 @@ import { searchCommand } from './command/search.js'
 // eslint-disable-next-line no-unused-vars
 const [_, __, command] = process.argv
 
-switch (true) {
-  case command === 'merge': {
+switch (command) {
+  case 'merge': {
     await mergeCommand()
     break
   }
-  case command === 'filter': {
-    await filterCommand()
+  case 'copy': {
+    await copyCommand()
     break;
   }
-  case command === 'extension': {
+  case 'extension': {
     await extensionCommand()
     break;
   }  
-  case command === 'empty': {
+  case 'empty': {
     await emptyCommand()
     break;
   } 
-  case command === 'hidden': {
+  case 'hidden': {
     await hiddenCommand()
     break;
   } 
-  case command === 'name': {
+  case 'name': {
     // the same name but different extension
     await nameCommand()
     break;
   } 
-  case command === 'search': {
-    // the same name but different extension
+  case 'search': {
     await searchCommand()
     break;
   } 
-  // case command === 'double': {
+  // case 'double': {
   //   await doubleCommand()
   //   break;
   // } 
   default: {
     console.log('usage: ')
-    console.log(' dirtool merge source-dir dest-dir')
-    console.log(' dirtool filter source-dir dest-dir filter')
-    console.log(' dirtool extension source-dir')
+    console.log(' dirtool copy source-dir dest-dir filter')
+    console.log(' dirtool empty dir [-R]')
+    console.log(' dirtool extension dir')
+    console.log(' dirtool hidden dir [-R]')
+    console.log(' dirtool merge source-dir dest-dir [-R]')
+    console.log(' dirtool name dir')
+    console.log(' dirtool search dir (substring|-rx=regexp)')
 
     process.exit(1)
   }

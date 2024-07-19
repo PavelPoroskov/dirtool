@@ -47,7 +47,7 @@ async function getFileList({ dir, filterList }) {
   return fileList
 }
 
-export async function filterCommand() {
+export async function copyCommand() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command, sourceDir, destDir, filter] = process.argv
 
@@ -58,7 +58,7 @@ export async function filterCommand() {
     ? filter.split(',').filter(Boolean)
     : []
 
-  if (command === 'filter' && isSourceDirExist && isDestDirExist && filterList.length > 0) {
+  if (command === 'copy' && isSourceDirExist && isDestDirExist && filterList.length > 0) {
     const fullSourceDir = path.resolve(sourceDir)
     const list = await getFileList({ dir: fullSourceDir, filterList })
 
@@ -110,7 +110,8 @@ export async function filterCommand() {
     console.log('Created dirs:', newDirList.length)
   } else {
     console.log('usage: ')
-    console.log(' dirtool filter source-dir dest-dir filter')
+    console.log(' dirtool copy source-dir dest-dir filter')
+    console.log('   Copy with subdirectories')
     console.log('   filter is list of file extensions with comma. e.i pdf,epub,fb2')
 
     process.exit(1)

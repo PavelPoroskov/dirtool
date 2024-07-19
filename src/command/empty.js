@@ -40,6 +40,7 @@ export async function emptyCommand() {
   } else {
     console.log('usage: ')
     console.log(' dirtool empty dir [-R]')
+    console.log('   Search empty subdirectories')
     console.log('   -R -- remove.')
     process.exit(1)
   }

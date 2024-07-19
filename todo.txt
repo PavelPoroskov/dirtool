@@ -27,7 +27,7 @@ DONE dirtool extension
 
   --list=zip
 
-dirtool info
+?dirtool info
   quantity of files
   quantity of dirs
   total volume
@@ -36,15 +36,20 @@ dirtool info
 TODO-NEXT dirtool double [-R]
   left one with most low level
 
-TODO-NEXT dirtool search nodejs microservice
-dirtool search (nodejs|javascript|typescript) microservice NOT=
+dirtool search nodejs microservice
   return list of files that contain this words in file name
+
+  npm run dev search /home/and/Documents/topic -- -rx="^\d\d\d\d\s"  DONE 
+
+  npm run dev search /home/and/Documents/topic -- scal  DONE 
+
+  npm run dev search /home/and/Documents/topic -- nodejs microservice
+
+  npm run dev search /home/and/Documents/topic -- nodejs|javascript|typescript microservice
 
 commands for two folders
 ========================
-DONE dirtool filter source-dir dest-dir pdf,epub,fb2,azw3
-
-  dirtool list => dirtool filter (dirtool copy filter=)
+DONE dirtool copy source-dir dest-dir pdf,epub,fb2,azw3
   
 // remove from source files that exist in dest-dir
 DONE dirtool merge source-dir dest-dir

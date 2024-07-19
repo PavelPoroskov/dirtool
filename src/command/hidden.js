@@ -40,6 +40,7 @@ export async function hiddenCommand() {
   } else {
     console.log('usage: ')
     console.log(' dirtool hidden dir [-R]')
+    console.log('   Search hidden subdirectories')
     console.log('   -R -- remove.')
     process.exit(1)
   }

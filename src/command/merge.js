@@ -316,7 +316,8 @@ export async function mergeCommand() {
   } else {
     console.log('usage: ')
     console.log(' dirtool merge [-R] source-dir dest-dir')
-    console.log('   -R -- Delete files in source directory that exist in dest directory. Delete empty subdirectories in source directory.')
+    console.log('   Delete files in source directory that exist in dest directory')
+    console.log('   -R -- remove.')
 
     process.exit(1)
   }
