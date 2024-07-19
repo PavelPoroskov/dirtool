@@ -48,6 +48,10 @@ dirtool search nodejs microservice
 
   npm run dev search /home/and/Documents/topic -- nodejs|javascript|typescript microservice
 
+?dirtool search-dir  (dirtool search -d -f)
+
+?dirtool check-link
+
 commands for two folders
 ========================
 DONE dirtool copy source-dir dest-dir pdf,epub,fb2,azw3

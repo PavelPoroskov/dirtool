@@ -1,4 +1,5 @@
 export const ignoreExtSet = new Set([
+  '.cfg',
   '.css',
   '.dot',
   '.hbs',
@@ -23,6 +24,8 @@ export const ignoreExtSet = new Set([
 ])
 
 export const ignoreFileSet = new Set([
+  'Cargo.lock',
+  'Cargo.toml.txt',
   'Cargo.toml',
   'code.zip',
   'css',

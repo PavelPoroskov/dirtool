@@ -1,5 +1,7 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
+import { ignoreExtSet, ignoreFileSet } from '../constant.js';
+import { getExtname } from '../module/index.js';
 
 export async function getAllFiles(inDir) {
   const dirIter = await opendir(inDir);
@@ -18,12 +20,23 @@ export async function getAllFiles(inDir) {
         )
       }
     } else if (dirent.isFile()) {
-      // console.log(dirent.parentPath, dirent.name)
-      fileList.push({
-        // parentPath: dirent.parentPath,
-        name: dirent.name,
-        fullPath: path.join(dirent.parentPath, dirent.name),
-      })
+      const ext = getExtname(dirent.name)
+
+      /* eslint-disable no-empty */
+      if (ignoreExtSet.has(ext)) {
+
+      } else if (ignoreFileSet.has(dirent.name)) {
+
+      } else if (dirent.name.startsWith('.')) {
+
+      } else {
+      /* eslint-enable no-empty */
+        fileList.push({
+          name: dirent.name,
+          fullPath: path.join(dirent.parentPath, dirent.name),
+        })
+      }
+      
     }
   }
 

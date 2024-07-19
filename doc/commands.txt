@@ -28,6 +28,6 @@ npm run dev search /home/den/Documents/topic -- scale|scalable|scaling
     
 npm run dev search /home/den/Documents/topic -- microservice
 
-npm run dev double /home/den/.tmp
+npm run dev double /home/den/Documents/topic
 
-npm run dev copy /home/and/Documents/topic /home/and/Documents/filter-result pdf,epub,fb2,fb2.zip,azw3
+npm run dev copy /home/den/Documents/topic /home/den/Documents/filter-result pdf,epub,fb2,fb2.zip,azw3
