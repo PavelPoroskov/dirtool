@@ -1,9 +1,7 @@
 
-import { opendir, mkdir, copyFile } from 'node:fs/promises';
+import { copyFile, mkdir, opendir, readlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { getExtname, getFileSize, isDirExist } from '../util/file-util.js';
-import { formatSize } from '../util/format.js';
-import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
+import { formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
 
 async function getFileList({ dir, filterList }) {
   const fileList = []
@@ -30,6 +28,7 @@ async function getFileList({ dir, filterList }) {
           fileList.push({
             name: dirent.name,
             fullPath: path.join(dirent.parentPath, dirent.name),
+            isSymbolicLink: dirent.isSymbolicLink()
           })
         }
       }
@@ -47,7 +46,11 @@ async function getFileList({ dir, filterList }) {
   return fileList
 }
 
-export async function copyCommand() {
+const COMMAND = 'copy'
+const description = 'Copy with subdirectories'
+const usage = 'dirtool copy source-dir dest-dir filter'
+
+async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command, sourceDir, destDir, filter] = process.argv
 
@@ -58,7 +61,7 @@ export async function copyCommand() {
     ? filter.split(',').filter(Boolean)
     : []
 
-  if (command === 'copy' && isSourceDirExist && isDestDirExist && filterList.length > 0) {
+  if (command === COMMAND && isSourceDirExist && isDestDirExist && filterList.length > 0) {
     const fullSourceDir = path.resolve(sourceDir)
     const list = await getFileList({ dir: fullSourceDir, filterList })
 
@@ -69,9 +72,10 @@ export async function copyCommand() {
 
     const copyList = list
       .sort((a,b) => a.fullPath.localeCompare(b.fullPath))
-      .map(({ fullPath }) => ({
+      .map(({ fullPath, isSymbolicLink }) => ({
         fromFullPath: fullPath,
-        toFullPath: `${fullDestDir2}${fullPath.slice(fullSourceDir2Length)}` 
+        toFullPath: `${fullDestDir2}${fullPath.slice(fullSourceDir2Length)}`,
+        isSymbolicLink
       }))
 
     const newDirSet = new Set()
@@ -89,17 +93,42 @@ export async function copyCommand() {
     })
 
     await runOperationsWithConcurrencyLimit20({
-      operationArgumentsList: copyList,
+      operationArgumentsList: copyList.filter(({ isSymbolicLink }) => !isSymbolicLink),
       asyncOperation: async ({ fromFullPath, toFullPath }) => {
         await copyFile(fromFullPath, toFullPath)
       },
     })
+    await runOperationsWithConcurrencyLimit20({
+      operationArgumentsList: copyList.filter(({ isSymbolicLink }) => isSymbolicLink),
+      asyncOperation: async ({ fromFullPath, toFullPath }) => {
+        const linkString = await readlink(fromFullPath)
+        const isLinkActual = await isExist(linkString)
+        // console.log('   linkString', linkString, isLinkActual)
+
+        if (isLinkActual) {
+          await copyFile(fromFullPath, toFullPath)
+        } else {
+          await writeFile(`${toFullPath}.link.txt`, `was link: ${linkString}`)
+          // console.log(`${toFullPath}.link.txt`)
+        }
+      },
+    })
 
     const getSizeResultList = await runOperationsWithConcurrencyLimit20({
-      operationArgumentsList: list,
-      asyncOperation: async ({ fullPath }) => {
-        const size = await getFileSize(fullPath)
-  
+      operationArgumentsList: copyList,
+      asyncOperation: async ({ fromFullPath, isSymbolicLink }) => {
+        let isCanRead = true
+        let size = 0
+
+        if (isSymbolicLink) {
+          const linkString = await readlink(fromFullPath)
+          isCanRead = await isExist(linkString)
+        }
+
+        if (isCanRead) {
+          size = await getFileSize(fromFullPath)
+        }
+        
         return size
       },
     })
@@ -109,11 +138,18 @@ export async function copyCommand() {
     console.log('Total size:', formatSize(totalSize))
     console.log('Created dirs:', newDirList.length)
   } else {
+    console.log(description)
     console.log('usage: ')
-    console.log(' dirtool copy source-dir dest-dir filter')
-    console.log('   Copy with subdirectories')
-    console.log('   filter is list of file extensions with comma. e.i pdf,epub,fb2')
+    console.log(usage)
+    console.log(' filter is list of file extensions with comma. e.i pdf,epub,fb2')
 
     process.exit(1)
   }
+}
+
+export default {
+  cliname: COMMAND,
+  commandRunner,
+  description,
+  usage
 }

@@ -1,8 +1,12 @@
 import path from 'node:path';
-import { isDirExist } from '../util/file-util.js';
+import { isDirExist } from '../api/module/index.js';
 import { getTheSameName } from '../api/api-query/getTheSameName.js';
 
-export async function nameCommand() {
+const COMMAND = 'same-name'
+const description = 'Search files with the same name but with different extension'
+const usage = 'dirtool same-name dir'
+
+async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
@@ -11,7 +15,7 @@ export async function nameCommand() {
   const [sourceDir] = argumentsWithoutKeys
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
 
-  if (command === 'name' && isSourceDirExist) {
+  if (command === COMMAND && isSourceDirExist) {
     const nameList = await getTheSameName(path.resolve(sourceDir))
 
     nameList
@@ -25,9 +29,16 @@ export async function nameCommand() {
           })
     })
   } else {
+    console.log(description)
     console.log('usage: ')
-    console.log(' dirtool name dir')
-    console.log('   Search files with the same name but with different extension')
+    console.log(usage)
     process.exit(1)
   }
+}
+
+export default {
+  cliname: COMMAND,
+  commandRunner,
+  description,
+  usage
 }

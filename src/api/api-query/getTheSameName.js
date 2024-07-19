@@ -1,45 +1,8 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
+import { ignoreExtSet, ignoreFileSet } from '../constant.js';
+import { getExtname, getNameWithoutExt } from '../module/index.js';
 
-import { getExtname, getNameWithoutExt } from '../../util/file-util.js';
-
-const ignoreExtSet = new Set([
-  '.css',
-  '.dot',
-  '.hbs',
-  '.html',
-  '.jpg',
-  '.js',
-  '.json',
-  '.jsx',
-  '.key',
-  '.lock',
-  '.md',
-  '.mp4',
-  '.ncx',
-  '.png',
-  '.rb',
-  '.rs.txt',
-  '.rs',
-  '.srt',
-  '.svg',
-  '.tla',
-  '.txt',
-])
-const ignoreFileSet = new Set([
-  'Cargo.toml',
-  'code.zip',
-  'css',
-  'Dockerfile',
-  'embeddings.zip',
-  'jit',
-  'LICENSE-APACHE',
-  'LICENSE-MIT',
-  'Rakefile',
-  'README',
-  'rustfmt-ignore',
-  'yarn.lock',
-])
 export async function getTheSameName(inFullPath) {
   const nameList = {}
 

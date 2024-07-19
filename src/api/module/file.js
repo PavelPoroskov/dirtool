@@ -1,11 +1,28 @@
 import fsP from 'node:fs/promises';
-import fs from 'node:fs';
+import fs, { unwatchFile } from 'node:fs';
 import crypto from 'node:crypto';
 
 export async function getFileSize(inFullPath) {
   const fileStats = await fsP.stat(inFullPath);
 
   return  fileStats.size
+}
+
+
+export async function getFirstNBytes(inFullPath) {
+  let filehandle;
+
+  try {
+    filehandle = await fsP.open(inFullPath);
+    const buf = Buffer.alloc(1024);
+    await filehandle.read(buf)
+    await filehandle.close();
+    filehandle = undefined
+
+    return buf.toString('hex')
+  } finally {
+    await filehandle?.close();
+  } 
 }
 
 export async function getFileHashMD5(inFullPath) {
@@ -64,14 +81,12 @@ export async function deleteFile(inFullPath) {
   await fsP.unlink(inFullPath);
 }
 
-export async function isDirExist(inFullPath) {
+export async function isExist(inFullPath) {
   let result = false
 
   try {
     await fsP.access(inFullPath, fsP.constants.R_OK | fsP.constants.W_OK);
-    const stats = await fsP.stat(inFullPath)
-
-    result = stats.isDirectory()
+    result = true
   } catch {
     result = false
   } 

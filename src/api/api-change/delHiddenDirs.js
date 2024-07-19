@@ -1,5 +1,6 @@
 import { rm } from 'node:fs/promises';
-import { runOperationsWithConcurrencyLimit20 } from '../../util/runOperationsWithConcurrencyLimit.js';
+import { runOperationsWithConcurrencyLimit20 } from '../module/index.js';
+import { getHiddenDirs } from '../api-query/getHiddenDirs.js';
 
 export async function delHiddenDirs(inFullPath) {
   const dirList = await getHiddenDirs(inFullPath)

@@ -1,6 +1,6 @@
 
 import { rm } from 'node:fs/promises';
-import { runOperationsWithConcurrencyLimit20 } from '../../util/runOperationsWithConcurrencyLimit.js';
+import { runOperationsWithConcurrencyLimit20 } from '../module/index.js';
 import { getEmptyDirs } from '../api-query/getEmptyDirs.js';
 
 export async function delEmptyDirs(inFullPath) {

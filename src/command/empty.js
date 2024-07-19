@@ -1,10 +1,13 @@
-import path from 'node:path';
 import { rm } from 'node:fs/promises';
-import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
-import { isDirExist } from '../util/file-util.js';
+import path from 'node:path';
 import { getEmptyDirs } from '../api/api-query/getEmptyDirs.js';
+import { isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
-export async function emptyCommand() {
+const COMMAND = 'empty'
+const description = 'Search empty subdirectories'
+const usage = 'dirtool empty dir [-R]'
+
+async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
@@ -17,7 +20,7 @@ export async function emptyCommand() {
 
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
 
-  if (command === 'empty' && isSourceDirExist) {
+  if (command === COMMAND && isSourceDirExist) {
     const dirList = await getEmptyDirs(path.resolve(sourceDir))
 
     if (!isDelete) {
@@ -38,10 +41,17 @@ export async function emptyCommand() {
       console.log('empty dirs was removed')
     }
   } else {
+    console.log(description)
     console.log('usage: ')
-    console.log(' dirtool empty dir [-R]')
-    console.log('   Search empty subdirectories')
-    console.log('   -R -- remove.')
+    console.log(usage)
+    console.log(' -R -- remove.')
     process.exit(1)
   }
+}
+
+export default {
+  cliname: COMMAND,
+  commandRunner,
+  description,
+  usage
 }

@@ -1,0 +1,33 @@
+npm run dev merge /home/den/Documents/merge-dir-data/ebook-2024-07-08 /home/den/Documents/merge-dir-data/topic -- -R
+
+npm run dev merge /home/den/Documents/merge-dir-data/macbook-2024-07-08 /home/den/Documents/merge-dir-data/topic -- -R
+
+npm run dev merge /home/den/Documents/merge-dir-data/usb128-BOOKs-2023-07-10 /home/den/Documents/merge-dir-data/topic -- -R
+
+npm run dev merge /home/den/Documents/merge-dir-data/topic /home/den/Documents/topic -- -R
+
+
+npm run dev extension /home/den/Documents/topic
+
+npm run dev filter /home/den/Documents/topic /home/den/Documents/merge-dir-data/filter-result pdf,epub,fb2,fb2.zip,azw3
+
+npm run dev empty /home/den/Documents/topic
+
+npm run dev hidden /home/den/Documents/topic
+
+npm run dev name /home/den/Documents/topic
+
+npm run dev search /home/den/Documents/topic -- -rx="^\d\d\d\d\s"
+
+npm run dev search /home/den/Documents/topic -- nodejs microservice
+
+npm run dev search /home/den/Documents/topic -- nodejs|javascript|typescript microservice
+
+npm run dev search /home/den/Documents/topic -- scal
+npm run dev search /home/den/Documents/topic -- scale|scalable|scaling
+    
+npm run dev search /home/den/Documents/topic -- microservice
+
+npm run dev double /home/den/.tmp
+
+npm run dev copy /home/and/Documents/topic /home/and/Documents/filter-result pdf,epub,fb2,fb2.zip,azw3

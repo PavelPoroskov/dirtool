@@ -33,8 +33,9 @@ DONE dirtool extension
   total volume
   ?most big folder. sorted descending with percentage
 
-TODO-NEXT dirtool double [-R]
+DONE dirtool double [-R]
   left one with most low level
+  TODO remove double in dir
 
 dirtool search nodejs microservice
   return list of files that contain this words in file name
@@ -53,5 +54,6 @@ DONE dirtool copy source-dir dest-dir pdf,epub,fb2,azw3
   
 // remove from source files that exist in dest-dir
 DONE dirtool merge source-dir dest-dir
+TODO optimization from dirtool double
 
 show used time

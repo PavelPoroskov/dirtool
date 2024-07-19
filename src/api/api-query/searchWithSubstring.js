@@ -1,5 +1,7 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
+import { ignoreExtSet } from '../constant.js';
+import { getExtname } from '../module/index.js';
 
 export async function searchWithSubstring({ dir, substring, regexp }) {
   const fullPathList = []
@@ -20,21 +22,29 @@ export async function searchWithSubstring({ dir, substring, regexp }) {
           )
         }
       } else if (dirent.isFile()) {
-        let isAdd = false
-        if (substring) {
-          if (dirent.name.includes(substring)) {
-            isAdd = true
-          }
-        } else if (regexpObj) {
-          if (regexpObj.test(dirent.name)) {
-            isAdd = true
-          }
-        }
+        const ext = getExtname(dirent.name)
 
-        if (isAdd) {
-          fullPathList.push(
-            path.join(dirent.parentPath, dirent.name)
-          )
+        /* eslint-disable no-empty */
+        if (ignoreExtSet.has(ext)) {
+
+        } else {
+        /* eslint-enable no-empty */
+          let isAdd = false
+          if (substring) {
+            if (dirent.name.includes(substring)) {
+              isAdd = true
+            }
+          } else if (regexpObj) {
+            if (regexpObj.test(dirent.name)) {
+              isAdd = true
+            }
+          }
+
+          if (isAdd) {
+            fullPathList.push(
+              path.join(dirent.parentPath, dirent.name)
+            )
+          }
         }
       }
     }

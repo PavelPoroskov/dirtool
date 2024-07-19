@@ -1,9 +1,6 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
-import { ExtraMap } from '../util/extra-structure.js';
-import { getExtname, getFileSize, isDirExist } from '../util/file-util.js';
-import { floorN, formatSize } from '../util/format.js';
-import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
+import { ExtraMap, floorN, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
 async function getExtStatistics(inDir) {
   const sizeMap = new ExtraMap()
@@ -84,7 +81,11 @@ async function getExtStatistics(inDir) {
   }
 }
 
-export async function extensionCommand() {
+const COMMAND = 'extension'
+const description = 'Statistics by file extensions'
+const usage = 'dirtool extension dir [-sn|-sz]'
+
+async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
@@ -98,7 +99,7 @@ export async function extensionCommand() {
 
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
 
-  if (command === 'extension' && isSourceDirExist) {
+  if (command === COMMAND && isSourceDirExist) {
     const { list, totalCountFile, totalSize, totalCountDir } = await getExtStatistics(path.resolve(sourceDir))
 
     if (isSortName) {
@@ -120,12 +121,19 @@ export async function extensionCommand() {
     console.log('Total size: ', formatSize(totalSize))
 
   } else {
+    console.log(description)
     console.log('usage: ')
-    console.log(' dirtool extension source-dir [-sn|-sz]')
-    console.log('   Statistics by file extensions')
-    console.log('   Default descending sort by quantity.')
-    console.log('   -sn -- sort by extension name.')
-    console.log('   -sz -- sort by size. descending')
+    console.log(usage)
+    console.log(' Default descending sort by quantity.')
+    console.log(' -sn -- sort by extension name.')
+    console.log(' -sz -- sort by size. descending')
     process.exit(1)
   }
+}
+
+export default {
+  cliname: COMMAND,
+  commandRunner,
+  description,
+  usage
 }

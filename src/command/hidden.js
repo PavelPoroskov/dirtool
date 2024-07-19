@@ -1,10 +1,13 @@
-import path from 'node:path';
 import { rm } from 'node:fs/promises';
-import { runOperationsWithConcurrencyLimit20 } from '../util/runOperationsWithConcurrencyLimit.js';
-import { isDirExist } from '../util/file-util.js';
+import path from 'node:path';
 import { getHiddenDirs } from '../api/api-query/getHiddenDirs.js';
+import { isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
-export async function hiddenCommand() {
+const COMMAND = 'hidden'
+const description = 'Search hidden subdirectories'
+const usage = 'dirtool hidden dir [-R]'
+
+async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
@@ -17,7 +20,7 @@ export async function hiddenCommand() {
 
   const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
 
-  if (command === 'hidden' && isSourceDirExist) {
+  if (command === COMMAND && isSourceDirExist) {
     const dirList = await getHiddenDirs(path.resolve(sourceDir))
 
     if (!isDelete) {
@@ -38,10 +41,17 @@ export async function hiddenCommand() {
       console.log('hidden dirs was removed')
     }
   } else {
+    console.log(description)
     console.log('usage: ')
-    console.log(' dirtool hidden dir [-R]')
-    console.log('   Search hidden subdirectories')
-    console.log('   -R -- remove.')
+    console.log(usage)
+    console.log(' -R -- remove.')
     process.exit(1)
   }
+}
+
+export default {
+  cliname: COMMAND,
+  commandRunner,
+  description,
+  usage
 }

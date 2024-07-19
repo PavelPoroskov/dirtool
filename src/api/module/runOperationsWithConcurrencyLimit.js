@@ -8,14 +8,9 @@ export const runOperationsWithConcurrencyLimit = async ({
     ? operationArgumentsList[Symbol.iterator]()
     : operationArgumentsList
 
-  function* makeArgumentsIndex() {
-    let index = 0;
-    while (true) {
-      yield index++;
-    }
-  }
 
-  const argumentsIndexIterator = makeArgumentsIndex()
+  let resultIndexGlobal = 0;
+
   const resultMap = new Map()
   let concurrentPromiseList
 
@@ -32,7 +27,7 @@ export const runOperationsWithConcurrencyLimit = async ({
 
   const chainNext = inPromise => inPromise.then(() => {
     // after inPromise resolved get next argument
-    const { value: resultIndex } = argumentsIndexIterator.next()
+    const resultIndex = resultIndexGlobal++
     const argumentsIteratorResult = argumentsIterator.next();
 
     if (!argumentsIteratorResult.done) {
