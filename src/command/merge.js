@@ -1,6 +1,6 @@
 
 import path from 'node:path';
-import { getDoubleList } from '../api/api-query/getDoubleList.js';
+import { getDoubleListTwo } from '../api/api-query/getDoubleListTwo.js';
 import { delEmptyDirs } from '../api/api-change/delEmptyDirs.js';
 import { delHiddenDirs } from '../api/api-change/delHiddenDirs.js';
 import { deleteFile, isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
@@ -28,11 +28,12 @@ async function commandRunner() {
       await delHiddenDirs(sourceDir)
     }  
 
-    const { sourceFileListSize, sourceDoubleList } = await getDoubleList({
+    const { sourceFileListSize, sourceDoubleList } = await getDoubleListTwo({
       sourceDir: path.resolve(sourceDir),
       destDir: path.resolve(destDir),
     })
-    console.log(`To remove files from source dir ${sourceDoubleList.length}`)
+    console.log(`The same files were in source and dest dir ${sourceDoubleList.length}.`)
+    let nRestFile = sourceFileListSize
 
     if (isDelete) {
       await runOperationsWithConcurrencyLimit20({
@@ -40,9 +41,9 @@ async function commandRunner() {
         asyncOperation: deleteFile,
       })
       console.log('The same files were removed from source directory')
+      nRestFile -= sourceDoubleList.length
     }  
 
-    const nRestFile = sourceFileListSize - sourceDoubleList.length
     console.log()
     console.log(`${nRestFile} files are left in source directory.`)
 

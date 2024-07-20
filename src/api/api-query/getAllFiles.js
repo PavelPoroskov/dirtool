@@ -44,6 +44,5 @@ export async function getAllFiles(inDir) {
     dirList.map((dirPath) => getAllFiles(dirPath))
   )
 
-  return fileListList.concat(fileList)
-    .flat()
+  return fileListList.flat().concat(fileList)
 }

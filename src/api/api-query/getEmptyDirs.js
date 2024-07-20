@@ -23,7 +23,7 @@ async function getDirs(inDir, level=0) {
   const isAllSubDirsEmpty = dirListListFlat.every(({ isEmpty }) => isEmpty)
 
 
-  if (isAllSubDirsEmpty && isEmpty) {
+  if (level > 0 && isAllSubDirsEmpty && isEmpty) {
     return [{ fullPath: inDir, level, isEmpty: true }]
   } else {
     return [{ fullPath: inDir, level, isEmpty: false }].concat(
