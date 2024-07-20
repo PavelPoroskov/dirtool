@@ -39,6 +39,10 @@ export async function getDoubleListOne(sourceDir) {
     }
   })
 
+  // Two file with size 0 will be double.
+  // Remove files with size 0 from searching doubles. 
+  delete fileBySize[0]
+
   const checkFirstNBytesList = []
   Object.entries(fileBySize).forEach(([size, fullPathList]) => {
     if (fullPathList.length > 0) {
