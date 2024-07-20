@@ -1,15 +1,15 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
-import { ExtraMap, floorN, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
+import { ExtraMap, floorPercent, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
 async function getExtStatistics(inDir) {
   const sizeMap = new ExtraMap()
   const countMap = new ExtraMap()
   let totalCountDir = 0
+  const fileList = []
 
   async function traverseDir(inDir) {
     const dirIter = await opendir(inDir);
-    const fileList = []
     const dirList = []
   
     for await (const dirent of dirIter) {
@@ -29,25 +29,6 @@ async function getExtStatistics(inDir) {
       }
     }
 
-    const getSizeResultList = await runOperationsWithConcurrencyLimit20({
-      operationArgumentsList: fileList,
-      asyncOperation: async ({ fullPath, name }) => {
-        const size = await getFileSize(fullPath)
-  
-        return {
-          fullPath,
-          name,
-          size,
-        }
-      },
-    })
-    getSizeResultList.forEach(({ name, size }) => {
-      // const ext = path.extname(fullPath)
-      const ext = getExtname(name)
-      sizeMap.sum(ext, size)
-      countMap.sum(ext, 1)
-    })
-  
     totalCountDir += dirList.length
     await Promise.all(
       dirList.map(
@@ -58,8 +39,24 @@ async function getExtStatistics(inDir) {
 
   await traverseDir(inDir)
 
-  // console.log('countMap', countMap)
-  // console.log('sizeMap', sizeMap)
+  const getSizeResultList = await runOperationsWithConcurrencyLimit20({
+    operationArgumentsList: fileList,
+    asyncOperation: async ({ fullPath, name }) => {
+      const size = await getFileSize(fullPath)
+
+      return {
+        fullPath,
+        name,
+        size,
+      }
+    },
+  })
+  getSizeResultList.forEach(({ name, size }) => {
+    // const ext = path.extname(fullPath)
+    const ext = getExtname(name)
+    sizeMap.sum(ext, size)
+    countMap.sum(ext, 1)
+  })
 
   const totalCountFile = Array.from(countMap.values()).reduce((acc,add) => acc + add, 0)
   const totalSize = Array.from(sizeMap.values()).reduce((acc,add) => acc + add, 0)
@@ -67,8 +64,8 @@ async function getExtStatistics(inDir) {
   const list = Array.from(countMap.entries())
     .map(([ext, count]) => {
       const size = sizeMap.get(ext) 
-      const countPercent = floorN(count/totalCountFile)
-      const sizePercent = floorN(size/totalSize)
+      const countPercent = floorPercent(count/totalCountFile)
+      const sizePercent = floorPercent(size/totalSize)
 
       return { ext, count, countPercent, size, sizePercent }
     })

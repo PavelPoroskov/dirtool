@@ -9,6 +9,10 @@ export const floorN = (n) => {
   return Math.floor(n * 100) / 100
 }
 
+export const floorPercent = (n) => {
+  return Math.floor(n * 10000) / 100
+}
+
 export function formatSize(n) {
   let result
 
