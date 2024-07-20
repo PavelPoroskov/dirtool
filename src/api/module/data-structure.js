@@ -18,7 +18,8 @@ export class ExtraMap extends Map {
   }
   push(key, item) {
     if (super.has(key)) {
-      super.set(key, super.get(key).push(item))
+      const ar = super.get(key)
+      super.set(key, ar.concat(item))
     } else {
       super.set(key, [item])
     }

@@ -1,72 +1,6 @@
 
-import { ExtraMap, getFileHashMD5, getFileSize, getFirstNBytes, runOperationsWithConcurrencyLimit20 } from '../module/index.js';
-import { getAllFiles } from './getAllFiles.js';
-
-async function getFileBySize(fullPathList, fileByFullPathMap) {
-  const resultList = await runOperationsWithConcurrencyLimit20({
-    operationArgumentsList: fullPathList,
-    asyncOperation: async (fullPath) => {
-      const size = await getFileSize(fullPath)
-
-      return {
-        fullPath,
-        size,
-      }
-    },
-  })
-
-  const fileByKey = new ExtraMap()
-  resultList.forEach(({ fullPath, size }) => {
-    fileByFullPathMap.update( fullPath, { size })
-
-    fileByKey.push(size, fullPath)
-  })
-
-  return fileByKey
-}
-
-async function getFileBySizeAndFirstNBytes(fullPathList, fileByFullPathMap) {
-  const resultList = await runOperationsWithConcurrencyLimit20({
-    operationArgumentsList: fullPathList,
-    asyncOperation: async (fullPath) => {
-      const firstNBytes = await getFirstNBytes(fullPath)
-
-      return {
-        fullPath,
-        firstNBytes,
-      }
-    },
-  })
-
-  const fileByKey = new ExtraMap()
-  resultList.forEach(({ fullPath, firstNBytes }) => {
-    fileByFullPathMap.update( fullPath, { firstNBytes })
-
-    const { size } = fileByFullPathMap.get(fullPath)
-    const key = `${size}#${firstNBytes}`
-    fileByKey.push(key, fullPath)
-  })
-
-  return fileByKey
-}
-
-async function getHashMD5ForList(fullPathList, fileByFullPathMap) {
-  const resultList = await runOperationsWithConcurrencyLimit20({
-    operationArgumentsList: fullPathList,
-    asyncOperation: async (fullPath) => {
-      const hashMD5 = await getFileHashMD5(fullPath)
-
-      return {
-        fullPath,
-        hashMD5,
-      }
-    },
-  })
-
-  resultList.forEach(({ fullPath, hashMD5 }) => {
-    fileByFullPathMap.update( fullPath, { hashMD5 })
-  })
-}
+import { ExtraMap } from '../module/index.js';
+import { getAllFiles, getFileBySizeMap, getFileBySizeAndFirstNBytesMap, getFileByHashMD5Map } from './getDoubleList.js';
 
 export async function getDoubleListTwo({ sourceDir, destDir }) {
   const sourceFileList = await getAllFiles(sourceDir)
@@ -90,12 +24,12 @@ export async function getDoubleListTwo({ sourceDir, destDir }) {
     destFilList.map(({ fullPath, name }) => [fullPath, { name }])
   )
 
-  const sourceFileBySizeMap = await getFileBySize(sourceFileByFullPath.keys(), sourceFileByFullPath)
+  const sourceFileBySizeMap = await getFileBySizeMap(sourceFileByFullPath.keys(), sourceFileByFullPath)
   // Two file with size 0 will be double.
   // Remove files with size 0 from searching doubles. 
   sourceFileBySizeMap.delete(0)
 
-  const destFileBySizeMap = await getFileBySize(destFileByFullPath.keys(), destFileByFullPath)
+  const destFileBySizeMap = await getFileBySizeMap(destFileByFullPath.keys(), destFileByFullPath)
 
   const checkFirstNBytesList = []
   sourceFileBySizeMap.forEach((sourceFullPathList, size) => {
@@ -108,11 +42,11 @@ export async function getDoubleListTwo({ sourceDir, destDir }) {
     }
   })
   
-  const sourceFileBySizeAndFirstNBytesMap = await getFileBySizeAndFirstNBytes(
+  const sourceFileBySizeAndFirstNBytesMap = await getFileBySizeAndFirstNBytesMap(
     checkFirstNBytesList.flatMap(({ sourceFullPathList }) => sourceFullPathList),
     sourceFileByFullPath,
   )
-  const destFileBySizeAndFirstNBytesMap = await getFileBySizeAndFirstNBytes(
+  const destFileBySizeAndFirstNBytesMap = await getFileBySizeAndFirstNBytesMap(
     checkFirstNBytesList.flatMap(({ destFullPathList }) => destFullPathList),
     destFileByFullPath,
   )
@@ -128,24 +62,21 @@ export async function getDoubleListTwo({ sourceDir, destDir }) {
     }
   })
 
-  await getHashMD5ForList(
+  const sourceFileByHashMap = await getFileByHashMD5Map(
     checkHashList.flatMap(({ sourceFullPathList }) => sourceFullPathList),
     sourceFileByFullPath,
   )
-  await getHashMD5ForList(
+  const destFileByHashMap = await getFileByHashMD5Map(
     checkHashList.flatMap(({ destFullPathList }) => destFullPathList),
     destFileByFullPath,
   )
 
-  checkHashList.forEach(({ sourceFullPathList, destFullPathList }) => {
-    const destHashSet = new Set(
-      destFullPathList.map((destFullPath) => destFileByFullPath.get(destFullPath).hashMD5)
-    )
-    sourceFullPathList.forEach((sourceFullPath) => {
-      if (destHashSet.has(sourceFileByFullPath.get(sourceFullPath).hashMD5)) {
+  sourceFileByHashMap.forEach((sourceFullPathList, hash) => {
+    if (destFileByHashMap.has(hash)) {
+      sourceFullPathList.forEach((sourceFullPath) => {
         sourceFileByFullPath.update( sourceFullPath, { isDouble: true })
-      }
-    })
+      })
+    }
   })
 
   const sourceDoubleList = []

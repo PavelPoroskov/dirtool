@@ -51,7 +51,7 @@ dirtool search nodejs microservice
 
   npm run dev search /home/den/Documents/topic -- microservice  DONE
   npm run dev search /home/den/Documents/topic -- scal  DONE 
-
+TODO-NEXT
   // two substring
   npm run dev search /home/den/Documents/topic -- nodejs microservice
   // or condition
@@ -60,7 +60,8 @@ dirtool search nodejs microservice
 
 ?dirtool search-dir  (dirtool search -d -f)
 
-?dirtool check-link
+
+TODO-NEXT ?dirtool check-link
 
 commands for two folders
 ========================
@@ -72,8 +73,6 @@ DONE dirtool merge source-dir dest-dir
   npm run dev merge /home/den/Documents/merge-dir-data/ebook-2024-07-08 /home/den/Documents/merge-dir-data/topic -- -R
   npm run dev merge /home/den/Documents/merge-dir-data/macbook-2024-07-08 /home/den/Documents/merge-dir-data/topic -- -R
   npm run dev merge /home/den/Documents/merge-dir-data/usb128-BOOKs-2023-07-10 /home/den/Documents/merge-dir-data/topic -- -R
-
-  TODO optimization from dirtool double
 
 show used time
 
