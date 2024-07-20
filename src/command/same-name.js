@@ -13,7 +13,7 @@ async function commandRunner() {
   const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
 
   const [sourceDir] = argumentsWithoutKeys
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
 
   if (command === COMMAND && isSourceDirExist) {
     const nameList = await getTheSameName(path.resolve(sourceDir))

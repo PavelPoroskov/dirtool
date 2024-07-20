@@ -18,7 +18,7 @@ async function commandRunner() {
   const [sourceDir] = argumentsWithoutKeys
   const isDelete = keyMap.has('-R')
 
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
 
   if (command === COMMAND && isSourceDirExist) {
     const dirList = await getHiddenDirs(path.resolve(sourceDir))

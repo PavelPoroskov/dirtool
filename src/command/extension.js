@@ -97,7 +97,7 @@ async function commandRunner() {
   const isSortName = keyMap.has('-sn')
   const isSortSize = keyMap.has('-sz')
 
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
 
   if (command === COMMAND && isSourceDirExist) {
     const { list, totalCountFile, totalSize, totalCountDir } = await getExtStatistics(path.resolve(sourceDir))

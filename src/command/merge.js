@@ -20,8 +20,8 @@ async function commandRunner() {
   const [sourceDir, destDir] = argumentsWithoutKeys
   const isDelete = keyMap.has('-R')
 
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
-  const isDestDirExist = !!destDir && isDirExist(destDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
+  const isDestDirExist = !!destDir && await isDirExist(destDir)
 
   if (command === COMMAND && isSourceDirExist && isDestDirExist) {
     if (isDelete) {

@@ -15,7 +15,7 @@ async function commandRunner() {
   const keyMap = new Map(keyList.map((i) => i.split('=')))
 
   const [sourceDir, substring] = argumentsWithoutKeys
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
 
   const regexp = keyMap.get('-rx')
 

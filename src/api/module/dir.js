@@ -11,6 +11,10 @@ export async function isDirExist(inFullPath) {
   } catch {
     result = false
   } 
+
+  if (!result) {
+    console.log('Error Not is Directory:', inFullPath)
+  }
   
   return result
 }

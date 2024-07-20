@@ -54,8 +54,8 @@ async function commandRunner() {
   // eslint-disable-next-line no-unused-vars
   const [_, __, command, sourceDir, destDir, filter] = process.argv
 
-  const isSourceDirExist = !!sourceDir && isDirExist(sourceDir)
-  const isDestDirExist = !!destDir && isDirExist(destDir)
+  const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
+  const isDestDirExist = !!destDir && await isDirExist(destDir)
 
   const filterList = filter
     ? filter.split(',').filter(Boolean)
