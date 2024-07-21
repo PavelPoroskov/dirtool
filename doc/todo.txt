@@ -60,7 +60,6 @@ TODO-NEXT
 
 ?dirtool search-dir  (dirtool search -d -f)
 
-
 DONE dirtool link
   npm run dev link /home/den/Documents/topic
 
@@ -77,6 +76,16 @@ DONE dirtool merge source-dir dest-dir
 
 show used time
 
+?common function to traverse directory
+  condition for dir: not hidden
+  condition for file: ext-list name-substring name-substring name-regexp name-regexp
+  condition for symlink
+
+  can be for one item: dir and symlink
+
+  condition for result (to add to result list): isFile, isSymlink, isFile
+
+  use level in condition
 
 common list
 ===========
