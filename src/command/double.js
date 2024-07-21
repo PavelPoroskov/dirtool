@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { deleteFile } from '../api/module/index.js';
-import { getDoubleListOne } from '../api/api-query/getDoubleListOne.js';
+import { getDoubleListOne } from '../api/api-query/getDoubleList.js';
 import { isDirExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
 const COMMAND = 'double'

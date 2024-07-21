@@ -61,7 +61,8 @@ TODO-NEXT
 ?dirtool search-dir  (dirtool search -d -f)
 
 
-TODO-NEXT ?dirtool check-link
+DONE dirtool link
+  npm run dev link /home/den/Documents/topic
 
 commands for two folders
 ========================

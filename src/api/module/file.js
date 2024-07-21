@@ -1,5 +1,5 @@
 import fsP from 'node:fs/promises';
-import fs, { unwatchFile } from 'node:fs';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 export async function getFileSize(inFullPath) {
@@ -7,7 +7,6 @@ export async function getFileSize(inFullPath) {
 
   return  fileStats.size
 }
-
 
 export async function getFirstNBytes(inFullPath) {
   let filehandle;
