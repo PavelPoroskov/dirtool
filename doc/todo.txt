@@ -67,7 +67,7 @@ DONE dirtool link
 commands for two folders
 ========================
 DONE dirtool copy source-dir dest-dir pdf,epub,fb2,azw3
-  npm run dev copy /home/den/Documents/topic /home/den/Documents/filter-result pdf,epub,fb2,fb2.zip,azw3
+  npm run dev copy /home/den/Documents/topic /home/den/Documents/topic-filter pdf,epub,fb2,fb2.zip,azw3
   
 // remove from source files that exist in dest-dir
 DONE dirtool merge source-dir dest-dir
