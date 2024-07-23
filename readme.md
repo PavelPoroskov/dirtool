@@ -1,3 +1,7 @@
+# dirtool  
+file utility for finding doubles, merging dirs
+
+# usage  
 dirtool copy source-dir dest-dir filter  
 &nbsp; &nbsp; Copy with subdirectories and filter by extension
 
