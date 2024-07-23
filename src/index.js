@@ -35,6 +35,7 @@ if (commandObj) {
   console.log('usage: ')
   commandList.forEach((commandObj) => {
     console.log(commandObj.usage)
+    console.log(' ', commandObj.description)
   })
 
   process.exit(1)

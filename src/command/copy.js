@@ -47,7 +47,7 @@ async function getFileList({ dir, filterList }) {
 }
 
 const COMMAND = 'copy'
-const description = 'Copy with subdirectories'
+const description = 'Copy with subdirectories and filter by extension'
 const usage = 'dirtool copy source-dir dest-dir filter'
 
 async function commandRunner() {
