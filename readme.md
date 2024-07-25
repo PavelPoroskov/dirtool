@@ -2,7 +2,7 @@
 file utility for finding doubles, merging dirs
 
 # usage  
-dirtool copy source-dir dest-dir filter  
+dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]
 &nbsp; &nbsp; Copy with subdirectories and filter by extension
 
 dirtool double dir [-R]  

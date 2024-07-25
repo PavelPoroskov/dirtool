@@ -4,7 +4,9 @@ import path from 'node:path';
 import { ExtraMap, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
 
 function makeFnIsFileNameFit({ filterExtList, filterNameList, filterNameRegExpList }) {
-  const extList = filterExtList.map((ext) => ext.startsWith('.') ? ext : `.${ext}`)
+  const extList0 = filterExtList.flatMap((i) => i.split(','))
+    .filter(Boolean)
+  const extList = extList0.map((ext) => ext.startsWith('.') ? ext : `.${ext}`)
   const extSet = new Set(extList)
 
   let regExpObList = []
@@ -109,8 +111,8 @@ async function getFileList({ dir, filterExtList, filterNameList, filterNameRegEx
 }
 
 const COMMAND = 'copy'
-const description = 'Copy with subdirectories and filter by extension'
-const usage = 'dirtool copy source-dir dest-dir filter'
+const description = 'Copy with subdirectories and filter'
+const usage = 'dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]'
 
 async function commandRunner() {
     // eslint-disable-next-line no-unused-vars
@@ -125,7 +127,7 @@ async function commandRunner() {
     if (value) {
       keyMap.push(
         key, 
-        value.split(',').filter(Boolean),
+        value,
       )
     } else {
       keyMap.push(
@@ -243,7 +245,11 @@ async function commandRunner() {
     console.log(description)
     console.log('usage: ')
     console.log(usage)
-    console.log(' filter is list of file extensions with comma. e.i pdf,epub,fb2')
+    const usage = 'dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]'
+    console.log(' -ext=pdf,epub,fb2')
+    console.log(' -name=substring')
+    console.log(' -name-rx="regexp"')
+    console.log(' -one-dir     Do not create subdirectories. All files are in root dest-dir')
 
     process.exit(1)
   }
