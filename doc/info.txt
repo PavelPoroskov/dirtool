@@ -1,0 +1,8 @@
+pdf with notes has different hash than pdf without notes
+  TODO compare pdf using info from pdf
+    ?-book-ignore-notes
+
+  the same for epub?
+
+
+can be for one item?: dir and symlink

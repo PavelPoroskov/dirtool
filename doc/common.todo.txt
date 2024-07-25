@@ -1,0 +1,48 @@
+do cli-command TODO-1
+    npm i dirtool
+    dirtool in command line
+        ?can test without npm-registry
+
+    use package.json[bin]
+
+common keys
+===========
+  -R to really remove files
+  -F to really fix links
+
+  -ext=epub,fb2,pdf // TODO
+  -name=substring   // TODO
+  -name="regext" or -name-rx="regext"
+
+  ?
+  -d condition for directory
+    -contains=zip
+    -files=0
+  -f condition for file
+  -wl=   white list
+  -bl=   black list
+
+  -empty
+  -hidden
+
+
+common function to traverse directory
+=====================================
+  for 'dirtool copy', 'dirtool search' // TODO
+    uses common -keys (-ext,-name=)
+
+    without keys returns all
+
+  condition for dir: not hidden
+  condition for file: ext-list name-substring name-substring name-regexp name-regexp
+  condition for symlink
+
+  condition for result (to add to result list): isFile, isSymlink, isFile
+
+  use level in condition
+
+
+show used time
+
+find dirs with zip and second file/dir
+    items.includes(.zip) item.length > 1
