@@ -21,7 +21,12 @@ export class ExtraMap extends Map {
       const ar = super.get(key)
       super.set(key, ar.concat(item))
     } else {
-      super.set(key, [item])
+      if (Array.isArray(item)) {
+        super.set(key, item)
+      } else {
+        super.set(key, [item])
+      }
+
     }
   }
 }

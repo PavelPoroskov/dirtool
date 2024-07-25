@@ -1,17 +1,81 @@
 
 import { copyFile, mkdir, opendir, readlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
+import { ExtraMap, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
 
-async function getFileList({ dir, filterList }) {
-  const fileList = []
-  const extList = filterList.map((ext) => ext.startsWith('.') ? ext : `.${ext}`)
-  const filterSet = new Set(extList)
+function makeFnIsFileNameFit({ filterExtList, filterNameList, filterNameRegExpList }) {
+  const extList = filterExtList.map((ext) => ext.startsWith('.') ? ext : `.${ext}`)
+  const extSet = new Set(extList)
+
+  let regExpObList = []
+  try {
+    regExpObList = filterNameRegExpList.map((regexp) => new RegExp(regexp, 'i'))
+  } catch (er) {
+    console.log('Error Wrong Regular Expression:', er)
+  }
+  
+  const isExtFit = (name) => {
+    const ext = getExtname(name)
+
+    return extSet.has(ext)
+  }
+
+  const isNameFit = (name) => {
+    return filterNameList.every((substring) => name.includes(substring))
+  }
+
+  const isNameFitRegExp = (name) => {
+    return regExpObList.every((regexpObj) => regexpObj.test(name))
+  }
+
+  let result = () => false
+
+  switch (true) {
+    case extList.length === 0 && filterNameList.length === 0 && regExpObList.length === 0: {
+      result = () => true
+      break
+    }
+    case extList.length === 0 && filterNameList.length === 0 && regExpObList.length > 0: {
+      result = isNameFitRegExp
+      break
+    }
+    case extList.length === 0 && filterNameList.length > 0 && regExpObList.length === 0: {
+      result = isNameFit
+      break
+    }
+    case extList.length === 0 && filterNameList.length > 0 && regExpObList.length > 0: {
+      result = (name) => isNameFit(name) && isNameFitRegExp(name)
+      break
+    }
+    case extList.length > 0 && filterNameList.length === 0 && regExpObList.length === 0: {
+      result = isExtFit
+      break
+    }
+    case extList.length > 0 && filterNameList.length === 0 && regExpObList.length > 0: {
+      result = (name) => isExtFit(name) && isNameFitRegExp(name)
+      break
+    }
+    case extList.length > 0 && filterNameList.length > 0 && regExpObList.length === 0: {
+      result = (name) => isExtFit(name) && isNameFit(name)
+      break
+    }
+    case extList.length > 0 && filterNameList.length > 0 && regExpObList.length > 0: {
+      result = (name) => isExtFit(name) && isNameFit(name) && isNameFitRegExp(name)
+      break
+    }
+  }
+
+  return result
+}
+
+async function getFileList({ dir, filterExtList, filterNameList, filterNameRegExpList }) {
+  const resultList = []
+  const fnIsFileNameFit = makeFnIsFileNameFit({ filterExtList, filterNameList, filterNameRegExpList })
 
   async function traverseDir(inDir) {
     const dirIter = await opendir(inDir);
     const dirList = []
-  
+    
     for await (const dirent of dirIter) {
       if (dirent.isDirectory()) {
         if (dirent.name.startsWith('.') || dirent.name === '__MACOSX') {
@@ -22,10 +86,8 @@ async function getFileList({ dir, filterList }) {
           )
         }
       } else if (dirent.isFile() || dirent.isSymbolicLink()) {
-        const ext = getExtname(dirent.name)
-
-        if (filterSet.has(ext)) {
-          fileList.push({
+        if (fnIsFileNameFit(dirent.name)) {
+          resultList.push({
             name: dirent.name,
             fullPath: path.join(dirent.parentPath, dirent.name),
             isSymbolicLink: dirent.isSymbolicLink()
@@ -43,7 +105,7 @@ async function getFileList({ dir, filterList }) {
 
   await traverseDir(dir)
 
-  return fileList
+  return resultList
 }
 
 const COMMAND = 'copy'
@@ -51,37 +113,77 @@ const description = 'Copy with subdirectories and filter by extension'
 const usage = 'dirtool copy source-dir dest-dir filter'
 
 async function commandRunner() {
-  // eslint-disable-next-line no-unused-vars
-  const [_, __, command, sourceDir, destDir, filter] = process.argv
+    // eslint-disable-next-line no-unused-vars
+  const [_, __, command] = process.argv.slice(0,3)
+  const argumentsAfterCommand = process.argv.slice(3)
+  const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
+  const keyList = argumentsAfterCommand.filter((i) => i.startsWith('-'))
+  const keyMap = new ExtraMap()
+  keyList.forEach((i) => {
+    const [key, value] = i.split('=')
 
+    if (value) {
+      keyMap.push(
+        key, 
+        value.split(',').filter(Boolean),
+      )
+    } else {
+      keyMap.push(
+        key, 
+        [],
+      )
+    }
+  })
+
+  const [sourceDir, destDir] = argumentsWithoutKeys
   const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
   const isDestDirExist = !!destDir && await isDirExist(destDir)
 
-  const filterList = filter
-    ? filter.split(',').filter(Boolean)
-    : []
+  const filterExtList = keyMap.get('-ext') || []
+  const filterNameList = keyMap.get('-name') || []
+  const filterNameRegExpList = keyMap.get('-name-rx') || []
+  const isOneDir = keyMap.has('-one-dir')
 
-  if (command === COMMAND && isSourceDirExist && isDestDirExist && filterList.length > 0) {
+  if (command === COMMAND && isSourceDirExist && isDestDirExist) {
+    if (filterExtList.length) {
+      console.log('filter ext', filterExtList)
+    }
+    if (filterNameList.length || filterNameRegExpList.length)  {
+      console.log('filter name', filterNameList.concat(filterNameRegExpList))
+    }
+
     const fullSourceDir = path.resolve(sourceDir)
-    const list = await getFileList({ dir: fullSourceDir, filterList })
+    const list = await getFileList({ dir: fullSourceDir, filterExtList, filterNameList, filterNameRegExpList })
 
-    const fullDestDir = path.resolve(destDir)
     const fullSourceDir2 = fullSourceDir.endsWith(path.sep) ? fullSourceDir : `${fullSourceDir}${path.sep}`
     const fullSourceDir2Length = fullSourceDir2.length
+    const fullDestDir = path.resolve(destDir)
     const fullDestDir2 = fullDestDir.endsWith(path.sep) ? fullDestDir : `${fullDestDir}${path.sep}`
 
-    const copyList = list
-      .sort((a,b) => a.fullPath.localeCompare(b.fullPath))
-      .map(({ fullPath, isSymbolicLink }) => ({
-        fromFullPath: fullPath,
-        toFullPath: `${fullDestDir2}${fullPath.slice(fullSourceDir2Length)}`,
-        isSymbolicLink
-      }))
+    let copyList = []
+    if (isOneDir) {
+      copyList = list
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .map(({ name, fullPath, isSymbolicLink }) => ({
+          fromFullPath: fullPath,
+          toFullPath: path.join(fullDestDir, name),
+          isSymbolicLink
+        }))
+    } else {
+      copyList = list
+        .sort((a,b) => a.fullPath.localeCompare(b.fullPath))
+        .map(({ fullPath, isSymbolicLink }) => ({
+          fromFullPath: fullPath,
+          toFullPath: `${fullDestDir2}${fullPath.slice(fullSourceDir2Length)}`,
+          isSymbolicLink
+        }))
+    }
 
     const newDirSet = new Set()
     copyList.forEach(({ toFullPath }) => {
       newDirSet.add(path.dirname(toFullPath))
     })
+    newDirSet.delete(fullDestDir)
     const newDirList = Array.from(newDirSet.keys()).sort((a,b) => a.localeCompare(b))
     // console.log('newDirList')
     // console.log(newDirList)

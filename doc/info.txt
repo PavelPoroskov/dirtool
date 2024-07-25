@@ -6,3 +6,4 @@ pdf with notes has different hash than pdf without notes
 
 
 can be for one item?: dir and symlink
+  not. dir or symlink

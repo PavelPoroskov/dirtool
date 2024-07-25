@@ -12,7 +12,7 @@ common keys
 
   -ext=epub,fb2,pdf // TODO
   -name=substring   // TODO
-  -name="regext" or -name-rx="regext"
+  -name-rx="regext"
 
   ?
   -d condition for directory

@@ -1,8 +1,12 @@
 
-TODO dirtool copy source-dir dest-dir -ext=pdf,epub,fb2,azw3
-TODO dirtool copy source-dir dest-dir -name=microservice -one-dir
-  -one-dir Do not create subdir
-  npm run dev copy /home/den/Documents/topic /home/den/Documents/topic-filter -ext=pdf,epub,fb2,fb2.zip,azw3
+DONE dirtool copy source-dir dest-dir -ext=pdf,epub,fb2,azw3
+DONE dirtool copy source-dir dest-dir -name=microservice -one-dir
+  npm run dev copy /home/and/Documents/topic /home/and/Documents/topic-filter -- -ext=pdf,epub,fb2,fb2.zip,azw3
+  npm run dev copy /home/and/Documents/topic /home/and/.tmp -- -ext=pdf,epub,fb2,fb2.zip,azw3 -one-dir
+  npm run dev copy /home/and/Documents/topic /home/and/.tmp -- -ext=pdf,epub,fb2,fb2.zip,azw3 -one-dir -name=microservice
+  npm run dev copy /home/and/Documents/topic /home/and/.tmp -- -ext=pdf,epub,fb2,fb2.zip,azw3 -one-dir -name=microservice -name-rx="(nodejs|typescript|javascript)"
+  npm run dev copy /home/and/Documents/topic /home/and/.tmp -- -ext=pdf,epub,fb2,fb2.zip,azw3 -one-dir -name-rx="plus"
+  npm run dev copy /home/and/Documents/topic /home/and/.tmp -- -ext=pdf,epub,fb2,fb2.zip,azw3 -one-dir -name-rx="wnt"
 
 DONE dirtool double [-R]
   source dir has internal doubles
