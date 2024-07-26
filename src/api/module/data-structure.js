@@ -16,17 +16,10 @@ export class ExtraMap extends Map {
       ...updateObj,
     })
   }
-  push(key, item) {
-    if (super.has(key)) {
-      const ar = super.get(key)
-      super.set(key, ar.concat(item))
-    } else {
-      if (Array.isArray(item)) {
-        super.set(key, item)
-      } else {
-        super.set(key, [item])
-      }
-
-    }
+  concat(key, inItem) {
+    const item = inItem === undefined ? [] : inItem
+    // item -- single item or array
+    const ar = super.get(key) || []
+    super.set(key, ar.concat(item))
   }
 }

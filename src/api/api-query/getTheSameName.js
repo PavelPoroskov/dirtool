@@ -1,10 +1,10 @@
 import { opendir } from 'node:fs/promises';
 import path from 'node:path';
 import { ignoreExtSet, ignoreFileSet } from '../constant.js';
-import { getExtname, getNameWithoutExt } from '../module/index.js';
+import { ExtraMap, getExtname, getNameWithoutExt } from '../module/index.js';
 
 export async function getTheSameName(inFullPath) {
-  const nameList = {}
+  const nameMap = new ExtraMap()
 
   async function traverseDir(inDir) {
     const dirIter = await opendir(inDir);
@@ -32,12 +32,10 @@ export async function getTheSameName(inFullPath) {
         } else {
         /* eslint-enable no-empty */
           const name = getNameWithoutExt(dirent.name)
-
-          if (nameList[name]) {
-            nameList[name].push(path.join(dirent.parentPath, dirent.name))
-          } else {
-            nameList[name] = [path.join(dirent.parentPath, dirent.name)]
-          }
+          nameMap.concat(
+            name, 
+            path.join(dirent.parentPath, dirent.name),
+          )
         }
       }
     }
@@ -51,7 +49,7 @@ export async function getTheSameName(inFullPath) {
 
   await traverseDir(inFullPath)
 
-  return Object.entries(nameList)
+  return Array.from(nameMap.entries())
     .filter(([, list]) => list.length > 1)
     .map(([name, fullPathList]) => {
       const sorted = fullPathList.sort((a,b) => a.localeCompare(b))

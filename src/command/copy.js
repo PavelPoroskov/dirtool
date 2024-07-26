@@ -124,17 +124,7 @@ async function commandRunner() {
   keyList.forEach((i) => {
     const [key, value] = i.split('=')
 
-    if (value) {
-      keyMap.push(
-        key, 
-        value,
-      )
-    } else {
-      keyMap.push(
-        key, 
-        [],
-      )
-    }
+    keyMap.concat( key, value )
   })
 
   const [sourceDir, destDir] = argumentsWithoutKeys

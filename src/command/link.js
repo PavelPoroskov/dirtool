@@ -91,7 +91,7 @@ async function commandRunner() {
       const fileList = await getAllFiles(path.resolve(sourceDir))
       const fileNameMap = new ExtraMap()
       fileList.forEach(({ name, fullPath }) => {
-        fileNameMap.push(name, fullPath)
+        fileNameMap.concat(name, fullPath)
       })
 
       async function tryFixLink({ fullPath }) {

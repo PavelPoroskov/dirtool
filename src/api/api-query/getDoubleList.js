@@ -14,14 +14,14 @@ async function getFileBySizeMap(fullPathList, fileByFullPathMap) {
     },
   })
 
-  const fileByKey = new ExtraMap()
+  const fileByKeyMap = new ExtraMap()
   resultList.forEach(({ fullPath, size }) => {
     fileByFullPathMap.update( fullPath, { size })
 
-    fileByKey.push(size, fullPath)
+    fileByKeyMap.concat(size, fullPath)
   })
 
-  return fileByKey
+  return fileByKeyMap
 }
 
 async function getFileBySizeAndFirstNBytesMap(fullPathList, fileByFullPathMap) {
@@ -37,16 +37,16 @@ async function getFileBySizeAndFirstNBytesMap(fullPathList, fileByFullPathMap) {
     },
   })
 
-  const fileByKey = new ExtraMap()
+  const fileByKeyMap = new ExtraMap()
   resultList.forEach(({ fullPath, firstNBytes }) => {
     fileByFullPathMap.update( fullPath, { firstNBytes })
 
     const { size } = fileByFullPathMap.get(fullPath)
     const key = `${size}#${firstNBytes}`
-    fileByKey.push(key, fullPath)
+    fileByKeyMap.concat(key, fullPath)
   })
 
-  return fileByKey
+  return fileByKeyMap
 }
 
 async function getFileByHashMD5Map(fullPathList, fileByFullPathMap) {
@@ -62,14 +62,14 @@ async function getFileByHashMD5Map(fullPathList, fileByFullPathMap) {
     },
   })
 
-  const fileByKey = new ExtraMap()
+  const fileByKeyMap = new ExtraMap()
   resultList.forEach(({ fullPath, hashMD5 }) => {
     fileByFullPathMap.update( fullPath, { hashMD5 })
 
-    fileByKey.push(hashMD5, fullPath)
+    fileByKeyMap.concat(hashMD5, fullPath)
   })
 
-  return fileByKey
+  return fileByKeyMap
 }
 
 export async function getDoubleListOne(sourceDir) {
