@@ -31,6 +31,9 @@ DONE dirtool extension
 
   npm run dev extension /home/den/Documents/topic
 
+  ?remove sort by name, sort by size
+    or use key -sort=name -sort-size
+
 DONE dirtool hidden [-R]
   npm run dev hidden /home/den/Documents/topic
 
@@ -50,23 +53,20 @@ dirtool same-name
     name (Copy).pdf name (Copy 2).pdf // for copy in linux
 
 
-dirtool search nodejs microservice
-  return list of files that contain this words in file name
-
-  npm run dev search /home/den/Documents/topic -- -rx="^\d\d\d\d\s"  DONE 
-
-  npm run dev search /home/den/Documents/topic -- microservice  DONE
-  npm run dev search /home/den/Documents/topic -- scal  DONE 
-TODO-NEXT
-  // two substring
-  npm run dev search /home/den/Documents/topic -- nodejs microservice
-  // or condition
-  npm run dev search /home/den/Documents/topic -- scale|scalable|scaling
-  npm run dev search /home/den/Documents/topic -- nodejs|javascript|typescript microservice
+dirtool search dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"]
+  TODO keys [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] as for dirtool copy
 
 
 ?dirtool search-dir  (dirtool search -d -f)
 
 
-?dirtool info
-  ?most big folder. sorted descending with percentage (dirtool volume)
+?dirtool word
+  statistics about words in file name
+    as for dirtool extension
+  
+    get words from name: regexp \b
+
+  ?index from words in file name
+
+  word1 & word2
+    "event driven"
