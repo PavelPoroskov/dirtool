@@ -1,9 +1,9 @@
 # dirtool  
-file utility for finding doubles, merging dirs
+file utility for finding doubles, merging dirs, filtering
 
 # usage  
-dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]
-&nbsp; &nbsp; Copy with subdirectories and filter by extension
+dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]  
+&nbsp; &nbsp; Copy with subdirectories and filter
 
 dirtool double dir [-R]  
 &nbsp; &nbsp; Find doubles
@@ -26,7 +26,7 @@ dirtool merge source-dir dest-dir [-R]
 dirtool same-name dir  
 &nbsp; &nbsp; Search files with the same name but with different extension
 
-dirtool search dir (substring|-rx=regexp)  
+dirtool search dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"]  
 &nbsp; &nbsp; Search files with substring in name or with regexp
 
 
