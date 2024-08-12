@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import copyCommand from './command/copy.js'
 import doubleCommand from './command/double.js'
 import emptyCommand from './command/empty.js'

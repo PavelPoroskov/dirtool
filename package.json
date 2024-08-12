@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node src/index"
   },
+  "bin": {
+    "dirtool": "src/index.js"
+  },
   "author": "",
   "license": "ISC",
   "description": "",

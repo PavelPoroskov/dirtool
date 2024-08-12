@@ -1,9 +1,12 @@
-do cli-command TODO-1
-    npm i dirtool
-    dirtool in command line
-        ?can test without npm-registry
+do cli-command DONE 
+  "bin": {
+    "dirtool": "src/index.js"
+  },
 
-    use package.json[bin]
+  src/index.js
+  #!/usr/bin/env node
+
+  npm i -g .
 
 common keys
 ===========
