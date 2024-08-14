@@ -1,40 +1,54 @@
 import path from 'node:path';
-import { isDirExist } from '../api/module/index.js';
-import { searchWithSubstring } from '../api/api-query/searchWithSubstring.js';
+import { ExtraMap, isDirExist } from '../api/module/index.js';
+import { selectFileList } from '../api/api-query/selectFileList.js';
 
 const COMMAND = 'search'
 const description = 'Search files with substring in name or with regexp'
-const usage = 'dirtool search dir (substring|-rx=regexp)'
+const usage = 'dirtool search <dir> [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"]'
 
 async function commandRunner() {
-  // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
   const [_, __, command] = process.argv.slice(0,3)
   const argumentsAfterCommand = process.argv.slice(3)
   const argumentsWithoutKeys = argumentsAfterCommand.filter((i) => !i.startsWith('-'))
   const keyList = argumentsAfterCommand.filter((i) => i.startsWith('-'))
-  const keyMap = new Map(keyList.map((i) => i.split('=')))
+  const keyMap = new ExtraMap()
+  keyList.forEach((i) => {
+    const [key, value] = i.split('=')
 
-  const [sourceDir, substring] = argumentsWithoutKeys
+    keyMap.concat( key, value )
+  })
+
+  const [sourceDir] = argumentsWithoutKeys
   const isSourceDirExist = !!sourceDir && await isDirExist(sourceDir)
 
-  const regexp = keyMap.get('-rx')
+  const filterExtList = keyMap.get('-ext') || []
+  const filterNameList = keyMap.get('-name') || []
+  const filterNameRegExpList = keyMap.get('-name-rx') || []
 
-  if (command === COMMAND && isSourceDirExist && (!!substring || !!regexp)) {
-    const fullPathList = await searchWithSubstring({
-      dir: path.resolve(sourceDir),
-      substring,
-      regexp,
-    })
+  if (command === COMMAND && isSourceDirExist) {
+    if (filterExtList.length) {
+      console.log('filter ext', filterExtList)
+    }
+    if (filterNameList.length || filterNameRegExpList.length)  {
+      console.log('filter name', filterNameList.concat(filterNameRegExpList))
+    }
 
-    fullPathList.forEach((d) => {
-      console.log(d)
+    const fullSourceDir = path.resolve(sourceDir)
+    const fileList = await selectFileList({ dir: fullSourceDir, filterExtList, filterNameList, filterNameRegExpList })
+    fileList
+      .sort(({ fullPath: a }, { fullPath: b } ) => a.localeCompare(b))
+
+    fileList.forEach(({ fullPath }) => {
+      console.log(fullPath)
     })
   } else {
     console.log(description)
     console.log('usage: ')
     console.log(usage)
-    // eslint-disable-next-line no-useless-escape
-    console.log('dirtool search dir -rx="^\d\d\d\d\s"')
+    console.log(' -ext=pdf,epub,fb2')
+    console.log(' -name=substring')
+    console.log(' -name-rx="regexp"')
 
     process.exit(1)
   }

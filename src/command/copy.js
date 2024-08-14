@@ -1,114 +1,8 @@
 
-import { copyFile, mkdir, opendir, readlink, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { ExtraMap, formatSize, getExtname, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
-
-function makeFnIsFileNameFit({ filterExtList, filterNameList, filterNameRegExpList }) {
-  const extList0 = filterExtList.flatMap((i) => i.split(','))
-    .filter(Boolean)
-  const extList = extList0.map((ext) => ext.startsWith('.') ? ext : `.${ext}`)
-  const extSet = new Set(extList)
-
-  let regExpObList = []
-  try {
-    regExpObList = filterNameRegExpList.map((regexp) => new RegExp(regexp, 'i'))
-  } catch (er) {
-    console.log('Error Wrong Regular Expression:', er)
-  }
-  
-  const isExtFit = (name) => {
-    const ext = getExtname(name)
-
-    return extSet.has(ext)
-  }
-
-  const isNameFit = (name) => {
-    return filterNameList.every((substring) => name.includes(substring))
-  }
-
-  const isNameFitRegExp = (name) => {
-    return regExpObList.every((regexpObj) => regexpObj.test(name))
-  }
-
-  let result = () => false
-
-  switch (true) {
-    case extList.length === 0 && filterNameList.length === 0 && regExpObList.length === 0: {
-      result = () => true
-      break
-    }
-    case extList.length === 0 && filterNameList.length === 0 && regExpObList.length > 0: {
-      result = isNameFitRegExp
-      break
-    }
-    case extList.length === 0 && filterNameList.length > 0 && regExpObList.length === 0: {
-      result = isNameFit
-      break
-    }
-    case extList.length === 0 && filterNameList.length > 0 && regExpObList.length > 0: {
-      result = (name) => isNameFit(name) && isNameFitRegExp(name)
-      break
-    }
-    case extList.length > 0 && filterNameList.length === 0 && regExpObList.length === 0: {
-      result = isExtFit
-      break
-    }
-    case extList.length > 0 && filterNameList.length === 0 && regExpObList.length > 0: {
-      result = (name) => isExtFit(name) && isNameFitRegExp(name)
-      break
-    }
-    case extList.length > 0 && filterNameList.length > 0 && regExpObList.length === 0: {
-      result = (name) => isExtFit(name) && isNameFit(name)
-      break
-    }
-    case extList.length > 0 && filterNameList.length > 0 && regExpObList.length > 0: {
-      result = (name) => isExtFit(name) && isNameFit(name) && isNameFitRegExp(name)
-      break
-    }
-  }
-
-  return result
-}
-
-async function getFileList({ dir, filterExtList, filterNameList, filterNameRegExpList }) {
-  const resultList = []
-  const fnIsFileNameFit = makeFnIsFileNameFit({ filterExtList, filterNameList, filterNameRegExpList })
-
-  async function traverseDir(inDir) {
-    const dirIter = await opendir(inDir);
-    const dirList = []
-    
-    for await (const dirent of dirIter) {
-      if (dirent.isDirectory()) {
-        if (dirent.name.startsWith('.') || dirent.name === '__MACOSX') {
-          // console.log('IGNORING DIR', path.join(dirent.parentPath, dirent.name))
-        } else {
-          dirList.push(
-            path.join(dirent.parentPath, dirent.name)
-          )
-        }
-      } else if (dirent.isFile() || dirent.isSymbolicLink()) {
-        if (fnIsFileNameFit(dirent.name)) {
-          resultList.push({
-            name: dirent.name,
-            fullPath: path.join(dirent.parentPath, dirent.name),
-            isSymbolicLink: dirent.isSymbolicLink()
-          })
-        }
-      }
-    }
-
-    await Promise.all(
-      dirList.map(
-        (fullPath) => traverseDir(fullPath)
-      )
-    )
-  }
-
-  await traverseDir(dir)
-
-  return resultList
-}
+import { ExtraMap, formatSize, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
+import { selectFileList } from '../api/api-query/selectFileList.js';
 
 const COMMAND = 'copy'
 const description = 'Copy with subdirectories and filter'
@@ -145,7 +39,7 @@ async function commandRunner() {
     }
 
     const fullSourceDir = path.resolve(sourceDir)
-    const list = await getFileList({ dir: fullSourceDir, filterExtList, filterNameList, filterNameRegExpList })
+    const list = await selectFileList({ dir: fullSourceDir, filterExtList, filterNameList, filterNameRegExpList })
 
     const fullSourceDir2 = fullSourceDir.endsWith(path.sep) ? fullSourceDir : `${fullSourceDir}${path.sep}`
     const fullSourceDir2Length = fullSourceDir2.length
@@ -235,7 +129,6 @@ async function commandRunner() {
     console.log(description)
     console.log('usage: ')
     console.log(usage)
-    const usage = 'dirtool copy source-dir dest-dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] [-one-dir]'
     console.log(' -ext=pdf,epub,fb2')
     console.log(' -name=substring')
     console.log(' -name-rx="regexp"')

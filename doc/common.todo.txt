@@ -13,8 +13,8 @@ common keys
   -R to really remove files
   -F to really fix links
 
-  -ext=epub,fb2,pdf // TODO
-  -name=substring   // TODO
+  -ext=epub,fb2,pdf
+  -name=substring   
   -name-rx="regext"
 
   ?
@@ -31,9 +31,8 @@ common keys
 
 common function to traverse directory
 =====================================
-  for 'dirtool copy', 'dirtool search' // TODO
+  for 'dirtool copy', 'dirtool search'
     uses common -keys (-ext,-name=)
-
     without keys returns all
 
   condition for dir: not hidden

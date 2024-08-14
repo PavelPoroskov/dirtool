@@ -52,10 +52,13 @@ dirtool same-name
     name (1).pdf name (N).pdf // for download from browser // TODO 
     name (Copy).pdf name (Copy 2).pdf // for copy in linux
 
-
 dirtool search dir [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"]
-  TODO keys [-ext=pdf,epub] [-name=substring] [-name-rx="regexp"] as for dirtool copy
-
+  dirtool search . -name=pdf
+  dirtool search . -name=PLUS
+  dirtool search . -name=data
+    designing-data-intensive-applications--notech--stream.pdf
+    data-oriented-programming.pdf
+  dirtool search . -name=stream
 
 ?dirtool search-dir  (dirtool search -d -f)
 
