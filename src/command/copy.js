@@ -1,8 +1,8 @@
 
-import { copyFile, mkdir, readlink, writeFile } from 'node:fs/promises';
+import { copyFile, cp, mkdir, readlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { ExtraMap, formatSize, getFileSize, isDirExist, runOperationsWithConcurrencyLimit20, isExist } from '../api/module/index.js';
 import { selectFileList } from '../api/api-query/selectFileList.js';
+import { ExtraMap, formatSize, getDirSize, getFileSize, isDirExist, isExist, runOperationsWithConcurrencyLimit20 } from '../api/module/index.js';
 
 const COMMAND = 'copy'
 const description = 'Copy with subdirectories and filter'
@@ -50,18 +50,20 @@ async function commandRunner() {
     if (isOneDir) {
       copyList = list
         .sort((a,b) => a.name.localeCompare(b.name))
-        .map(({ name, fullPath, isSymbolicLink }) => ({
+        .map(({ name, fullPath, isSymbolicLink, isDirectory }) => ({
           fromFullPath: fullPath,
           toFullPath: path.join(fullDestDir, name),
-          isSymbolicLink
+          isSymbolicLink,
+          isDirectory,
         }))
     } else {
       copyList = list
         .sort((a,b) => a.fullPath.localeCompare(b.fullPath))
-        .map(({ fullPath, isSymbolicLink }) => ({
+        .map(({ fullPath, isSymbolicLink, isDirectory }) => ({
           fromFullPath: fullPath,
           toFullPath: `${fullDestDir2}${fullPath.slice(fullSourceDir2Length)}`,
-          isSymbolicLink
+          isSymbolicLink,
+          isDirectory,
         }))
     }
 
@@ -81,7 +83,7 @@ async function commandRunner() {
     })
 
     await runOperationsWithConcurrencyLimit20({
-      operationArgumentsList: copyList.filter(({ isSymbolicLink }) => !isSymbolicLink),
+      operationArgumentsList: copyList.filter(({ isSymbolicLink, isDirectory }) => !isSymbolicLink && !isDirectory),
       asyncOperation: async ({ fromFullPath, toFullPath }) => {
         await copyFile(fromFullPath, toFullPath)
       },
@@ -101,27 +103,39 @@ async function commandRunner() {
         }
       },
     })
+    await runOperationsWithConcurrencyLimit20({
+      operationArgumentsList: copyList.filter(({ isDirectory }) => isDirectory),
+      asyncOperation: async ({ fromFullPath, toFullPath }) => {
+        await cp(fromFullPath, toFullPath, { recursive: true })
+      },
+    })
 
     const getSizeResultList = await runOperationsWithConcurrencyLimit20({
       operationArgumentsList: copyList,
-      asyncOperation: async ({ fromFullPath, isSymbolicLink }) => {
-        let isCanRead = true
+      asyncOperation: async ({ toFullPath, isSymbolicLink, isDirectory }) => {
         let size = 0
 
-        if (isSymbolicLink) {
-          const linkString = await readlink(fromFullPath)
-          isCanRead = await isExist(linkString)
+        if (isDirectory) {
+          size = await getDirSize(toFullPath)
+        } else if (isSymbolicLink) {
+          const linkString = await readlink(toFullPath)
+          const isCanRead = await isExist(linkString)
+          if (isCanRead) {
+            size = await getFileSize(toFullPath)
+          }
+        } else {
+          size = await getFileSize(toFullPath)
         }
 
-        if (isCanRead) {
-          size = await getFileSize(fromFullPath)
-        }
-        
         return size
       },
     })
     const totalSize = getSizeResultList.reduce((acc, item) => acc + item, 0)
+    copyList.forEach(({ toFullPath, isDirectory }) => {
+      console.log(toFullPath, isDirectory ? 'DIR' : '')
+    })
 
+    console.log()
     console.log('Copied files:', list.length)
     console.log('Total size:', formatSize(totalSize))
     console.log('Created dirs:', newDirList.length)

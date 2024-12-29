@@ -39,8 +39,8 @@ async function commandRunner() {
     fileList
       .sort(({ fullPath: a }, { fullPath: b } ) => a.localeCompare(b))
 
-    fileList.forEach(({ fullPath }) => {
-      console.log(fullPath)
+    fileList.forEach(({ fullPath, isDirectory }) => {
+      console.log(fullPath, isDirectory ? 'DIR' : '')
     })
   } else {
     console.log(description)

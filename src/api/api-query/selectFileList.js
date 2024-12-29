@@ -89,13 +89,20 @@ export async function selectFileList({ dir, filterExtList, filterNameList, filte
           dirList.push(
             path.join(dirent.parentPath, dirent.name)
           )
+          if (fnIsFileNameFit(dirent.name)) {
+            resultList.push({
+              name: dirent.name,
+              fullPath: path.join(dirent.parentPath, dirent.name),
+              isDirectory: true,
+            })
+          }
         }
       } else if (dirent.isFile() || dirent.isSymbolicLink()) {
         if (fnIsFileNameFit(dirent.name)) {
           resultList.push({
             name: dirent.name,
             fullPath: path.join(dirent.parentPath, dirent.name),
-            isSymbolicLink: dirent.isSymbolicLink()
+            isSymbolicLink: dirent.isSymbolicLink(),
           })
         }
       }
