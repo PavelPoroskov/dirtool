@@ -118,10 +118,14 @@ async function commandRunner() {
         if (isDirectory) {
           size = await getDirSize(toFullPath)
         } else if (isSymbolicLink) {
-          const linkString = await readlink(toFullPath)
-          const isCanRead = await isExist(linkString)
-          if (isCanRead) {
-            size = await getFileSize(toFullPath)
+          const isExistLinkFile = await isExist(toFullPath)
+
+          if (isExistLinkFile) {
+            const linkString = await readlink(toFullPath)
+            const isCanRead = await isExist(linkString)
+            if (isCanRead) {
+              size = await getFileSize(toFullPath)
+            }  
           }
         } else {
           size = await getFileSize(toFullPath)
